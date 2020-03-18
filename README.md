@@ -28,7 +28,6 @@ Expert-C on [MIT-Adobe FiveK dataset](https://data.csail.mit.edu/graphics/fivek/
          1. Testing
          2. Training1
          3. Training2
-         4. 上述三个文件夹中的数据集都需要存储在其下的子文件夹中，不能直接放在根文件夹中
    2. model：用来存放所有训练产生的文件，其下还需新建：
       1. gt_images
       2. input_images
