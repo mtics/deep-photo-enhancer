@@ -18,17 +18,13 @@ def dataLoader():
     print("Loading Dataset")
     transform = transforms.Compose([transforms.Resize((SIZE, SIZE), interpolation=2), transforms.ToTensor()])
 
-    expert_c_folder = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/', transform=transform)
+    testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Testing/', transform=transform)
+    trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training1/', transform=transform)
+    trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training2/', transform=transform)
 
-    input_folder = torchvision.datasets.ImageFolder(root='./images_LR/input/', transform=transform)
-
-    testset_gt = expert_c_folder[0]
-    trainset_1_gt = expert_c_folder[1]
-    trainset_2_gt = expert_c_folder[2]
-
-    testset_inp = input_folder[0]
-    trainset_1_inp = input_folder[1]
-    trainset_2_inp = input_folder[2]
+    testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Testing/', transform=transform)
+    trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training1/', transform=transform)
+    trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training2/', transform=transform)
 
     trainLoader1 = torch.utils.data.DataLoader(
         ConcatDataset(
