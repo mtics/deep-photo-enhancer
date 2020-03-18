@@ -2,22 +2,20 @@
 
 ## 复现代码
 
-1. `[Experimental_Code_Data]_Deep-Photo-Enhancer`为论文作者的复现代码，运行起来有些问题，就没再使用
-2. https://github.com/hyerania/Deep-Learning-Project为我现在使用的复现代码的网址，效果不如作者的，因其'.git'文件太大，不方便传送，所以只保留了其下SourceCode
+本代码根据论文《Deep Photo Enhancer: Unpaired Learning for Image Enhancement from Photographs with GANs》。
+
+原作者代码库：[nothinglo/Deep-Photo-Enhancer](https://github.com/nothinglo/Deep-Photo-Enhancer)
 
 ## 所需环境
 
-具体见environment.yaml(Deep-Learning-Project的环境)
+- Python 3.6
+- CUDA 10.0
+- 具体见requirements.txt，使用如下命令安装依赖：
+`pip install -r requirements.txt`
 
 ## 所需数据集
 
-因为数据集过大，故我放在了阿里云OSS上，网址如下
-
-https://aspi.oss-cn-beijing.aliyuncs.com/backup/handled/handled-imageset.tar.00X(这个X取值1-6)
-
-因为太大了，所以分成了六部分，注意要把最后的X换成具体数字
-
-https://aspi.oss-cn-beijing.aliyuncs.com/backup/handled/input.tar这个是您给我的驾驶员数据集
+Expert-C on [MIT-Adobe FiveK dataset](https://data.csail.mit.edu/graphics/fivek/)
 
 ## 部分操作
 
@@ -41,4 +39,4 @@ https://aspi.oss-cn-beijing.aliyuncs.com/backup/handled/input.tar这个是您给
       7. train_images
       8. train_test_images
    3. models:用来存放log_PreTraining.txt
-   4. 训练后的gan1_pretrain_x_xxx.pth需要放在SourceCode文件夹下
+   4. 训练后的gan1_pretrain_XXx_xxx.pth需要放在SourceCode文件夹下
