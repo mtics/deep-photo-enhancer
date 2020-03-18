@@ -5,14 +5,6 @@ from libs.compute import *
 from libs.constant import *
 from libs.model import *
 
-# def computeGeneratorLoss(inputs, outputs_g1):
-#     gen_adv_loss1 = generatorAdversarialLoss(outputs_g1)
-#     i_loss = criterion(inputs, outputs_g1.detach())
-#     gen_loss = -gen_adv_loss1 + ALPHA * i_loss
-#
-#     return gen_loss
-
-
 if __name__ == "__main__":
 
     start_time = datetime.now()
@@ -83,16 +75,19 @@ if __name__ == "__main__":
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), dLoss.item(), gLoss.item()))
             f.close()
 
-            if batches_done % 1 == 0:
-                save_image(fake_imgs.data[:25], "./models/train_images/1Way_Train_%d.png" % batches_done, nrow=1,
-                           normalize=True)
+            if batches_done % 50 == 0:
+                for k in range(0, fake_imgs.data.shape[0]):
+                    save_image(fake_imgs.data[k], "./models/train_images/1Way_Train_%d_%d.png" % (batches_done, k),
+                               nrow=1,
+                               normalize=True)
                 torch.save(generator.state_dict(),
                            './models/train_checkpoint/gan1_train_' + str(epoch) + '_' + str(i) + '.pth')
                 torch.save(discriminator.state_dict(),
                            './models/train_checkpoint/discriminator_train_' + str(epoch) + '_' + str(i) + '.pth')
                 fake_test_imgs = generator(testInput)
-                save_image(fake_test_imgs.data, "./models/train_test_images/1Way_Train_Test_%d.png" % batches_done,
-                           nrow=5, normalize=True)
+                for k in range(0, fake_test_imgs.data.shape[0]):
+                    save_image(fake_test_imgs.data[k], "./models/train_test_images/1Way_Train_Test_%d_%d.png" % (batches_done, k),
+                               nrow=1, normalize=True)
 
             batches_done += 1
             print("Done training discriminator on iteration: %d" % i)
