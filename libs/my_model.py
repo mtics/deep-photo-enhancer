@@ -58,10 +58,8 @@ class Generator(nn.Module):
         self.conv52 = nn.Conv2d(128, 128, 5, stride=2, padding=2)
 
         # input 8x8x128 output 1x1x128
-        self.conv531 = nn.Conv2d(128, 128, 8, stride=2, padding=0)
+        self.conv53 = nn.Conv2d(128, 128, 8, stride=2, padding=0)
 
-        # input 1x1x128 output 1x1x128
-        self.conv532 = nn.Conv2d(128, 128, 8, stride=2, padding=2)
 
         # input 32x32x128 output 32x32x128
         # the global features should be concatenated to the feature map after this layer
@@ -139,7 +137,7 @@ class Generator(nn.Module):
         x52 = self.conv52(x51)
 
         # input 8x8x128 to output 1x1x128
-        x53 = self.conv532(x52)
+        x53 = self.conv53(x52)
         x53_temp = torch.cat([x53] * 32, dim=2)
         x53_temp = torch.cat([x53_temp] * 32, dim=3)
 
