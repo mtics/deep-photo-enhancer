@@ -5,7 +5,7 @@ from torch import autograd
 from torch.autograd import Variable
 
 from libs.constant import *
-from libs.model import *
+from libs.my_model import *
 
 
 def data_loader():
