@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # Creating generator and discriminator
     generator = Generator()
     generator = nn.DataParallel(generator)
-    generator.load_state_dict(torch.load('./gan1_pretrain_49_56.pth'))
+    generator.load_state_dict(torch.load('./gan1_pretrain_50_113.pth'))
     generator.train()
 
     discriminator = Discriminator()

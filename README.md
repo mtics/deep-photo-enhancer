@@ -39,3 +39,8 @@ Expert-C on [MIT-Adobe FiveK dataset](https://data.csail.mit.edu/graphics/fivek/
       8. train_test_images
    3. models:用来存放log_PreTraining.txt
    4. 训练后的gan1_pretrain_XXx_xxx.pth需要放在SourceCode文件夹下
+
+## Cost Time
+
+- Pretrain: 3H55M
+- Train: 2H45M
