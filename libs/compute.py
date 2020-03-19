@@ -8,12 +8,7 @@ from libs.constant import *
 from libs.model import *
 
 
-# device = torch.device('cuda')  # Default CUDA device
-# Tensor_gpu = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
-# Tensor = torch.FloatTensor
-
-
-def dataLoader():
+def data_loader():
     # Converting the images for PILImage to tensor, so they can be accepted as the input to the network
     print("Loading Dataset")
     transform = transforms.Compose([transforms.Resize((SIZE, SIZE), interpolation=2), transforms.ToTensor()])
@@ -26,7 +21,7 @@ def dataLoader():
     trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training1/', transform=transform)
     trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training2/', transform=transform)
 
-    trainLoader1 = torch.utils.data.DataLoader(
+    train_loader_1 = torch.utils.data.DataLoader(
         ConcatDataset(
             trainset_1_gt,
             trainset_1_inp
@@ -35,7 +30,7 @@ def dataLoader():
         shuffle=True,
     )
 
-    trainLoader2 = torch.utils.data.DataLoader(
+    train_loader_2 = torch.utils.data.DataLoader(
         ConcatDataset(
             trainset_2_gt,
             trainset_2_inp
@@ -44,7 +39,7 @@ def dataLoader():
         shuffle=True,
     )
 
-    trainLoader_cross = torch.utils.data.DataLoader(
+    train_loader_cross = torch.utils.data.DataLoader(
         ConcatDataset(
             trainset_2_inp,
             trainset_1_gt
@@ -53,7 +48,7 @@ def dataLoader():
         shuffle=True,
     )
 
-    testLoader = torch.utils.data.DataLoader(
+    test_loader = torch.utils.data.DataLoader(
         ConcatDataset(
             testset_gt,
             testset_inp
@@ -63,36 +58,36 @@ def dataLoader():
     )
     print("Finished loading dataset")
 
-    return trainLoader1, trainLoader2, trainLoader_cross, testLoader
+    return train_loader_1, train_loader_2, train_loader_cross, test_loader
 
 
 # Gradient Penalty
-def computeGradientPenalty(D, realSample, fakeSample):
-    alpha = Tensor_gpu(np.random.random((realSample.shape)))
-    interpolates = (alpha * realSample + ((1 - alpha) * fakeSample)).requires_grad_(True)
-    dInterpolation = D(interpolates)
-    fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
+def compute_gradient_penalty(D, real_sample, fake_sample):
+    alpha = Tensor_gpu(np.random.random(real_sample.shape))
+    interpolates = (alpha * real_sample + ((1 - alpha) * fake_sample)).requires_grad_(True)
+    d_interpolation = D(interpolates)
+    fake_output = Variable(Tensor_gpu(real_sample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
 
     gradients = autograd.grad(
-        outputs=dInterpolation,
+        outputs=d_interpolation,
         inputs=interpolates,
-        grad_outputs=fakeOutput,
+        grad_outputs=fake_output,
         create_graph=True,
         retain_graph=True,
         only_inputs=True)[0]
 
-    ## Use Adadpative weighting scheme
+    # Use Adaptive weighting scheme
     gradients = gradients.view(gradients.size(0), -1)
-    maxVals = []
-    normGradients = gradients.norm(2, dim=1) - 1
-    for i in range(len(normGradients)):
-        if (normGradients[i] > 0):
-            maxVals.append(Variable(normGradients[i].type(Tensor)).detach().numpy())
+    max_vals = []
+    norm_gradients = gradients.norm(2, dim=1) - 1
+    for i in range(len(norm_gradients)):
+        if norm_gradients[i] > 0:
+            max_vals.append(Variable(norm_gradients[i].type(Tensor)).detach().numpy())
         else:
-            maxVals.append(0)
+            max_vals.append(0)
 
-    gradientPenalty = np.mean(maxVals)
-    return gradientPenalty
+    gradient_penalty = np.mean(max_vals)
+    return gradient_penalty
 
 
 # Generator Loss

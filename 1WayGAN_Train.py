@@ -23,12 +23,12 @@ if __name__ == "__main__":
         discriminator.cuda(device=device)
 
     # Loading Training and Test Set Data
-    trainLoader1, trainLoader2, trainLoader_cross, testLoader = dataLoader()
+    trainLoader1, trainLoader2, trainLoader_cross, testLoader = data_loader()
 
     # MSE Loss and Optimizer
     criterion = nn.MSELoss()
 
-    optimizer_g1 = optim.Adam(generator.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
+    optimizer_g = optim.Adam(generator.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
     optimizer_d = optim.Adam(discriminator.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
 
     # Training Network
@@ -55,17 +55,17 @@ if __name__ == "__main__":
             # Fake Images
             fakeValid = discriminator(fake_imgs)
 
-            gradientPenalty = computeGradientPenalty(discriminator, realImgs.data, fake_imgs.data)
+            gradientPenalty = compute_gradient_penalty(discriminator, realImgs.data, fake_imgs.data)
             dLoss = discriminatorLoss(realValid, fakeValid, gradientPenalty)
             dLoss.backward(retain_graph=True)
             optimizer_d.step()
 
             if batches_done % 50 == 0:
                 # TRAIN GENERATOR
-                optimizer_g1.zero_grad()
+                optimizer_g.zero_grad()
                 gLoss = computeGeneratorLoss(trainInput, fake_imgs, discriminator, criterion)
                 gLoss.backward(retain_graph=True)
-                optimizer_g1.step()
+                optimizer_g.step()
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), dLoss.item(), gLoss.item()))

@@ -21,7 +21,7 @@ if __name__ == "__main__":
         discriminator.cuda(device=device)
 
     # Loading Training and Test Set Data
-    trainLoader1, trainLoader2, trainLoader_cross, testLoader = dataLoader()
+    trainLoader1, trainLoader2, trainLoader_cross, testLoader = data_loader()
 
     ### MSE Loss and Optimizer
     criterion = nn.MSELoss()
