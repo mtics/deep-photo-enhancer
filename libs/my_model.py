@@ -57,7 +57,7 @@ class Generator(nn.Module):
         self.conv52 = nn.Conv2d(128, 128, 5, stride=2, padding=2)
 
         # input 8x8x128 output 1x1x128
-        self.conv53 = nn.Conv2d(128, 128, 5, stride=2, padding=1)
+        self.conv53 = nn.Conv2d(128, 128, 8, stride=2, padding=0)
 
         # input 32x32x128 output 32x32x128
         # the global features should be concatenated to the feature map after this layer
@@ -71,44 +71,44 @@ class Generator(nn.Module):
         # input 32x32x128 output 64x64x128
         self.dconv1 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.ConvTranspose2d(128, 128, 4, stride=2, padding=1),
-            nn.BatchNorm2d(128)
+            nn.BatchNorm2d(128),
+            nn.ConvTranspose2d(128, 128, 4, stride=2, padding=1)
         )
 
         # input 64x64x128 ouput 128x128x128
         self.dconv2 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.ConvTranspose2d(256, 128, 4, stride=2, padding=1),
-            nn.BatchNorm2d(128)
+            nn.BatchNorm2d(128),
+            nn.ConvTranspose2d(256, 128, 4, stride=2, padding=1)
         )
 
         # input 128x128x192 output 256x256x64
         self.dconv3 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.ConvTranspose2d(192, 64, 4, stride=2, padding=1),
-            nn.BatchNorm2d(64)
+            nn.BatchNorm2d(64),
+            nn.ConvTranspose2d(192, 64, 4, stride=2, padding=1)
         )
 
         # input 256x256x96 ouput 512x512x32
         self.dconv4 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.ConvTranspose2d(96, 32, 4, stride=2, padding=1),
-            nn.BatchNorm2d(32)
+            nn.BatchNorm2d(32),
+            nn.ConvTranspose2d(96, 32, 4, stride=2, padding=1)
         )
 
         # final convolutional layers
         # input 512x512x48 output 512x512x16
         self.conv8 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.Conv2d(48, 16, 5, stride=1, padding=2),
-            nn.BatchNorm2d(16)
+            nn.BatchNorm2d(16),
+            nn.Conv2d(48, 16, 5, stride=1, padding=2)
         )
 
         # input 512x512x16 output 512x512x3
         self.conv9 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.Conv2d(16, 3, 5, stride=1, padding=2),
-            nn.BatchNorm2d(3)
+            nn.BatchNorm2d(3),
+            nn.Conv2d(16, 3, 5, stride=1, padding=2)
         )
 
     def forward(self, x):
