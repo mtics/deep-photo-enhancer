@@ -80,7 +80,7 @@ class Generator(nn.Module):
         # input 64x64x128 ouput 128x128x128
         self.dconv2 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.ConvTranspose2d(128, 128, 4, stride=2, padding=1),
+            nn.ConvTranspose2d(256, 128, 4, stride=2, padding=1),
             nn.BatchNorm2d(128)
         )
 
