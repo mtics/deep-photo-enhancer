@@ -78,21 +78,21 @@ class Generator(nn.Module):
         # input 64x64x128 ouput 128x128x128
         self.dconv2 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.BatchNorm2d(128),
+            nn.BatchNorm2d(256),
             nn.ConvTranspose2d(256, 128, 4, stride=2, padding=1)
         )
 
         # input 128x128x192 output 256x256x64
         self.dconv3 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.BatchNorm2d(64),
+            nn.BatchNorm2d(192),
             nn.ConvTranspose2d(192, 64, 4, stride=2, padding=1)
         )
 
         # input 256x256x96 ouput 512x512x32
         self.dconv4 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.BatchNorm2d(32),
+            nn.BatchNorm2d(96),
             nn.ConvTranspose2d(96, 32, 4, stride=2, padding=1)
         )
 
@@ -100,14 +100,14 @@ class Generator(nn.Module):
         # input 512x512x48 output 512x512x16
         self.conv8 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.BatchNorm2d(16),
+            nn.BatchNorm2d(48),
             nn.Conv2d(48, 16, 5, stride=1, padding=2)
         )
 
         # input 512x512x16 output 512x512x3
         self.conv9 = nn.Sequential(
             nn.SELU(inplace=True),
-            nn.BatchNorm2d(3),
+            nn.BatchNorm2d(16),
             nn.Conv2d(16, 3, 5, stride=1, padding=2)
         )
 
@@ -135,7 +135,7 @@ class Generator(nn.Module):
         x52 = self.conv52(x51)
 
         # input 8x8x128 to output 1x1x128
-        x53 = self.conv53(self.conv53(x52))
+        x53 = self.conv53(x52)
         x53_temp = torch.cat([x53] * 32, dim=2)
         x53_temp = torch.cat([x53_temp] * 32, dim=3)
 
