@@ -107,7 +107,7 @@ if __name__ == "__main__":
             psnr = 10 * torch.log10(1 / loss)
             psnrAvg += psnr
 
-            if batches_done == 99:
+            if batches_done >= 95:
                 for k in range(0, output.data.shape[0]):
                     save_image(output.data[k],
                                "./models/test_images/test_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
