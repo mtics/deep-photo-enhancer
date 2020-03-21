@@ -222,8 +222,7 @@ class Discriminator(nn.Module):
         # the output of this layer we need layers for global features
         self.conv7 = nn.Sequential(
             nn.Conv2d(128, 1, 16),
-            nn.LeakyReLU(inplace=True),
-            nn.InstanceNorm2d(1)
+            nn.LeakyReLU(inplace=True)
         )
 
     def forward(self, x):
