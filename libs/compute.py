@@ -154,7 +154,7 @@ def computeIdentityMappingLoss(x, x1, y, y1):
     """
     # MSE Loss and Optimizer
     criterion = nn.MSELoss()
-    i_loss = criterion(x, y1) + criterion(y, x1)
+    i_loss = criterion(x, y1).mean() + criterion(y, x1).mean()
 
     return i_loss
 
