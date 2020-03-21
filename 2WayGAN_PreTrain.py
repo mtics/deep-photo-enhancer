@@ -11,11 +11,14 @@ if __name__ == "__main__":
 
     # Creating generator and discriminator
     generator = Generator()
+    discriminator = Discriminator()
 
     generator = nn.DataParallel(generator)
+    discriminator = nn.DataParallel(discriminator)
 
     if torch.cuda.is_available():
         generator.cuda(device=device)
+        discriminator.cuda(device=device)
 
     # Loading Training and Test Set Data
     trainLoader1, trainLoader2, trainLoader_cross, testLoader = data_loader()
@@ -23,7 +26,8 @@ if __name__ == "__main__":
     ### MSE Loss and Optimizer
     criterion = nn.MSELoss()
 
-    optimizer_g = optim.Adam(generator.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
+    optimizer_g1 = optim.Adam(generator.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
+    optimizer_d = optim.Adam(discriminator.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
 
     ### GENERATOR PRE-TRAINING LOOP
     print("Pre-training loop starting")
@@ -37,12 +41,12 @@ if __name__ == "__main__":
             unenhanced = Variable(unenhanced_image.type(Tensor_gpu))
             enhanced = Variable(enhanced_image.type(Tensor_gpu))
 
-            optimizer_g.zero_grad()
+            optimizer_g1.zero_grad()
 
             generated_enhanced_image = generator(enhanced)
             loss = criterion(generated_enhanced_image, enhanced)
             loss.backward()
-            optimizer_g.step()
+            optimizer_g1.step()
 
             # Print statistics
             running_loss += loss.item()

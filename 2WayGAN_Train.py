@@ -43,36 +43,50 @@ if __name__ == "__main__":
         for i, (data, gt1) in enumerate(trainLoader_cross, 0):
             input, dummy = data
             groundTruth, dummy = gt1
-            trainInput = Variable(input.type(Tensor_gpu))
-            real_imgs = Variable(groundTruth.type(Tensor_gpu))
+            trainInput = Variable(input.type(Tensor_gpu))   # stands for X
+            realImgs = Variable(groundTruth.type(Tensor_gpu))   # stands for Y
 
             # TRAIN DISCRIMINATOR
             optimizer_d.zero_grad()
-            fake_imgs = generator(trainInput)
+            fake_imgs = generator(trainInput)   # stands for Y'
+            x1 = generator(realImgs)    # stands for x'
+
+            x2 = generator(fake_imgs)   # stands for x''
+            y2 = generator(x1)          # stands for y''
 
             # Real Images
-            realValid = discriminator(real_imgs)
+            realValid = discriminator(realImgs)     # stands for D_Y
             # Fake Images
-            fakeValid = discriminator(fake_imgs)
+            fakeValid = discriminator(fake_imgs)     # stands for D_Y'
 
-            gradientPenalty = compute_gradient_penalty(discriminator, real_imgs.data, fake_imgs.data)
-            dLoss = discriminatorLoss(realValid, fakeValid, gradientPenalty)
-            dLoss.backward(retain_graph=True)
+            dx = discriminator(trainInput)      # stands for D_X
+            dx1 = discriminator(x1)             # stands for D_X'
+
+            i_loss = computeIdentityMappingLoss(trainInput, x1, realImgs, fake_imgs)
+            c_loss = computeCycleConsistencyLoss(trainInput, x2, realImgs, y2)
+
+            ad, ag = computeAdversarialLosses(discriminator, trainInput, x1, realImgs, fake_imgs)
+
+            gradient_penalty = computeGradientPenaltyFor2Way(generator, discriminator, trainInput, realImgs)
+
+            d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
+            d_loss.backward(retain_graph=True)
+
             optimizer_d.step()
 
             if batches_done % 50 == 0:
                 # TRAIN GENERATOR
                 optimizer_g.zero_grad()
-                gLoss = computeGeneratorLoss(trainInput, fake_imgs, discriminator, criterion)
-                gLoss.backward(retain_graph=True)
+                g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
+                g_loss.backward(retain_graph=True)
                 optimizer_g.step()
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]" % (
-                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), dLoss.item(), gLoss.item()))
+                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item()))
 
             f = open("./models/log_Train.txt", "a+")
             f.write("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), dLoss.item(), gLoss.item()))
+                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item()))
             f.close()
 
             if batches_done % 50 == 0:
@@ -101,9 +115,9 @@ if __name__ == "__main__":
             input, dummy = data
             groundTruth, dummy = gt
             trainInput = Variable(input.type(Tensor_gpu))
-            real_imgs = Variable(groundTruth.type(Tensor_gpu))
+            realImgs = Variable(groundTruth.type(Tensor_gpu))
             output = generator(trainInput)
-            loss = criterion(output, real_imgs)
+            loss = criterion(output, realImgs)
             psnr = 10 * torch.log10(1 / loss)
             psnrAvg += psnr
 
@@ -113,8 +127,8 @@ if __name__ == "__main__":
                                "./models/test_images/test_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
                                nrow=1,
                                normalize=True)
-                for k in range(0, real_imgs.data.shape[0]):
-                    save_image(real_imgs.data[k],
+                for k in range(0, realImgs.data.shape[0]):
+                    save_image(realImgs.data[k],
                                "./models/gt_images/gt_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
                                nrow=1,
                                normalize=True)
