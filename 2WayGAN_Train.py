@@ -62,13 +62,8 @@ if __name__ == "__main__":
             dx = discriminator(trainInput)      # stands for D_X
             dx1 = discriminator(x1)             # stands for D_X'
 
-            i_loss = computeIdentityMappingLoss(trainInput, x1, realImgs, fake_imgs)
-            i_loss.backward(retain_graph=True)
-            c_loss = computeCycleConsistencyLoss(trainInput, x2, realImgs, y2)
-            c_loss.backward(retain_graph=True)
             ad, ag = computeAdversarialLosses(discriminator, trainInput, x1, realImgs, fake_imgs)
             ad.backward(retain_graph=True)
-            ag.backward(retain_graph=True)
             gradient_penalty = computeGradientPenaltyFor2Way(discriminator, trainInput, x1, realImgs, fake_imgs)
             d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
             d_loss.backward(retain_graph=True)
@@ -78,6 +73,11 @@ if __name__ == "__main__":
             if batches_done % 50 == 0:
                 # TRAIN GENERATOR
                 optimizer_g.zero_grad()
+                ag.backward(retain_graph=True)
+                i_loss = computeIdentityMappingLoss(trainInput, x1, realImgs, fake_imgs)
+                i_loss.backward(retain_graph=True)
+                c_loss = computeCycleConsistencyLoss(trainInput, x2, realImgs, y2)
+                c_loss.backward(retain_graph=True)
                 g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
                 g_loss.backward(retain_graph=True)
                 optimizer_g.step()
