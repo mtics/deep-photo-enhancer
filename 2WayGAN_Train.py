@@ -47,7 +47,7 @@ if __name__ == "__main__":
             realImgs = Variable(groundTruth.type(Tensor_gpu))   # stands for Y
 
             # TRAIN DISCRIMINATOR
-            optimizer_d.zero_grad()
+            discriminator.zero_grad()
             fake_imgs = generator(trainInput)   # stands for Y'
             x1 = generator(realImgs)    # stands for x'
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
             if batches_done % 50 == 0:
                 # TRAIN GENERATOR
-                optimizer_g.zero_grad()
+                generator.zero_grad()
                 ag.backward(retain_graph=True)
                 i_loss = computeIdentityMappingLoss(trainInput, x1, realImgs, fake_imgs)
                 i_loss.backward(retain_graph=True)
