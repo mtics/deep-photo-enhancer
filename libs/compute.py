@@ -154,7 +154,7 @@ def computeIdentityMappingLoss(x, x1, y, y1):
     """
     # MSE Loss and Optimizer
     criterion = nn.MSELoss()
-    i_loss = criterion(x, y1).mean() + criterion(y, x1).mean()
+    i_loss = criterion(x, y1) + criterion(y, x1)
 
     return i_loss
 
@@ -171,7 +171,7 @@ def computeCycleConsistencyLoss(x, x2, y, y2):
     """
     # MSE Loss and Optimizer
     criterion = nn.MSELoss()
-    c_loss = criterion(x, y2).mean() + criterion(y, x2).mean()
+    c_loss = criterion(x, y2) + criterion(y, x2)
 
     return c_loss
 
@@ -196,9 +196,9 @@ def computeAdversarialLosses(discriminator, x, x1, y, y1):
     dy = discriminator(y)
     dy1 = discriminator(y1)
 
-    ad = criterion(dx).mean() - criterion(dx1).mean() + \
-         criterion(dy).mean() - criterion(dy1).mean()
-    ag = criterion(dx1).mean() + criterion(dy1).mean()
+    ad = criterion(dx) - criterion(dx1) + \
+         criterion(dy) - criterion(dy1)
+    ag = criterion(dx1) + criterion(dy1)
 
     return ad, ag
 
