@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
             ad, ag = computeAdversarialLosses(discriminator, trainInput, x1, realImgs, fake_imgs)
 
-            gradient_penalty = computeGradientPenaltyFor2Way(generator, discriminator, trainInput, realImgs)
+            gradient_penalty = computeGradientPenaltyFor2Way(discriminator, trainInput, realImgs)
 
             d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
             d_loss.backward(retain_graph=True)

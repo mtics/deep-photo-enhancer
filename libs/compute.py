@@ -171,7 +171,7 @@ def computeCycleConsistencyLoss(x, x2, y, y2):
     """
     # MSE Loss and Optimizer
     criterion = nn.MSELoss()
-    c_loss = criterion(x, y2) + criterion(y, x2)
+    c_loss = criterion(x, y2).mean() + criterion(y, x2).mean()
 
     return c_loss
 
@@ -196,14 +196,14 @@ def computeAdversarialLosses(discriminator, x, x1, y, y1):
     dy = discriminator(y)
     dy1 = discriminator(y1)
 
-    ad = criterion(dx) - criterion(dx1) + \
-         criterion(dy) - criterion(dy1)
-    ag = criterion(dx1) + criterion(dy1)
+    ad = torch.mean(dx) - torch.mean(dx1) + \
+         torch.mean(dy) - torch.mean(dy1)
+    ag = torch.mean(dx1) + torch.mean(dy1)
 
     return ad, ag
 
 
-def computeGradientPenaltyFor2Way(generator, discriminator, x, x1, y, y1):
+def computeGradientPenaltyFor2Way(discriminator, x, x1, y, y1):
     """
     This function is used to compute the gradient penalty for 2-Way GAN
     The equations are Equation(10)(11) in Chp6
