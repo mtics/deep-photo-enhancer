@@ -63,12 +63,14 @@ if __name__ == "__main__":
             dx1 = discriminator(x1)             # stands for D_X'
 
             i_loss = computeIdentityMappingLoss(trainInput, x1, realImgs, fake_imgs)
+            i_loss.backward(retain_graph=True)
             c_loss = computeCycleConsistencyLoss(trainInput, x2, realImgs, y2)
-
+            c_loss.backward(retain_graph=True)
             ad, ag = computeAdversarialLosses(discriminator, trainInput, x1, realImgs, fake_imgs)
-
+            ad.backward(retain_graph=True)
+            ag.backward(retain_graph=True)
             gradient_penalty = computeGradientPenaltyFor2Way(discriminator, trainInput, x1, realImgs, fake_imgs)
-
+            gradient_penalty.backward(retain_graph=True)
             d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
             d_loss.backward(retain_graph=True)
 
