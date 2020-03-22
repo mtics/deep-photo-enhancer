@@ -42,5 +42,5 @@ Expert-C on [MIT-Adobe FiveK dataset](https://data.csail.mit.edu/graphics/fivek/
 
 ## Cost Time
 
-- Pretrain: 3H55M  8H45M
-- Train: 2H45M  2H49M
+- Pretrain: 3H55M  8H45M 9H25M
+- Train: 2H45M  2H49M 3H03M 5H38M(2Way)
