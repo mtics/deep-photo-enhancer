@@ -66,6 +66,46 @@ def data_loader():
 
 
 # Gradient Penalty
+# def compute_gradient_penalty(discriminator, real_sample, fake_sample):
+#     """
+#     This function used to compute Gradient Penalty
+#     The equation is Equation(4) in Chp5
+#     :param discriminator: stands for D_Y
+#     :param real_sample: stands for Y
+#     :param fake_sample: stands for Y'
+#     :return gradient_penalty: instead of the global parameter LAMBDA
+#     """
+#     alpha = Tensor_gpu(np.random.random(real_sample.shape))
+#     interpolates = (alpha * real_sample + ((1 - alpha) * fake_sample)).requires_grad_(True)  # stands for y^
+#     d_interpolation = discriminator(interpolates)  # stands for D_Y(y^)
+#     fake_output = Variable(Tensor_gpu(real_sample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
+#
+#     gradients = autograd.grad(
+#         outputs=d_interpolation,
+#         inputs=interpolates,
+#         grad_outputs=fake_output,
+#         create_graph=True,
+#         retain_graph=True,
+#         only_inputs=True)[0]
+#
+#     # Use Adaptive weighting scheme
+#     # The following codes stand for the Equation(4) in Chp5
+#     gradients = gradients.view(gradients.size(0), -1)
+#     max_vals = []
+#     norm_gradients = gradients.norm(2, dim=1) - 1
+#     for i in range(len(norm_gradients)):
+#         if norm_gradients[i] > 0:
+#             max_vals.append(Variable(norm_gradients[i].type(Tensor)).detach().numpy())
+#         else:
+#             max_vals.append(0)
+#
+#     tensor_max_vals = torch.as_tensor(max_vals, dtype=torch.float64, device=device)
+#
+#     # gradient_penalty = np.mean(max_vals)
+#     gradient_penalty = torch.mean(tensor_max_vals)
+#     return gradient_penalty
+
+
 def compute_gradient_penalty(discriminator, real_sample, fake_sample):
     """
     This function used to compute Gradient Penalty
@@ -95,11 +135,15 @@ def compute_gradient_penalty(discriminator, real_sample, fake_sample):
     norm_gradients = gradients.norm(2, dim=1) - 1
     for i in range(len(norm_gradients)):
         if norm_gradients[i] > 0:
-            max_vals.append(Variable(norm_gradients[i].type(Tensor)).detach().numpy())
+            temp_data = Variable(norm_gradients[i].type(Tensor)).detach().numpy()
+            max_vals.append(temp_data)
         else:
             max_vals.append(0)
 
-    gradient_penalty = np.mean(max_vals)
+    tensor_max_vals = torch.as_tensor(max_vals, dtype=torch.float64, device=device)
+
+    # gradient_penalty = np.mean(max_vals)
+    gradient_penalty = torch.mean(tensor_max_vals)
     return gradient_penalty
 
 
