@@ -59,6 +59,12 @@ class Generator(nn.Module):
         # input 8x8x128 output 1x1x128
         self.conv53 = nn.Conv2d(128, 128, 8, stride=2, padding=0)
 
+        self.fc = nn.Sequential(
+            nn.Linear(1, 1),
+            nn.SELU(inplace=True),
+            nn.Linear(1, 1),
+        )
+
         # input 32x32x128 output 32x32x128
         # the global features should be concatenated to the feature map after this layer
         # the output after concat would be 32x32x256
@@ -136,6 +142,7 @@ class Generator(nn.Module):
 
         # input 8x8x128 to output 1x1x128
         x53 = self.conv53(x52)
+        x53 = self.fc(x53)
         x53_temp = torch.cat([x53] * 32, dim=2)
         x53_temp = torch.cat([x53_temp] * 32, dim=3)
 
@@ -225,6 +232,12 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(inplace=True)
         )
 
+        self.fc = nn.Sequential(
+            nn.Linear(1, 1),
+            nn.SELU(inplace=True),
+            nn.Linear(1, 1),
+        )
+
     def forward(self, x):
         # input 512x512x3 to output 512x512x16
         x = self.conv1(x)
@@ -247,6 +260,8 @@ class Discriminator(nn.Module):
         # input 16x16x128 to output 1x1x1
         x = self.conv7(x)
 
+        x = self.fc(x)
+        
         return x
 
 
