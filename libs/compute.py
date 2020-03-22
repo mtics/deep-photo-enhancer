@@ -144,6 +144,7 @@ def compute_gradient_penalty(discriminator, real_sample, fake_sample):
 
     # gradient_penalty = np.mean(max_vals)
     gradient_penalty = torch.mean(tensor_max_vals)
+    gradient_penalty.backward(retain_graph=True)
     return gradient_penalty
 
 
