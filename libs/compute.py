@@ -118,7 +118,8 @@ def compute_gradient_penalty(discriminator, real_sample, fake_sample):
     alpha = Tensor_gpu(np.random.random(real_sample.shape))
     interpolates = (alpha * real_sample + ((1 - alpha) * fake_sample)).requires_grad_(True)  # stands for y^
     d_interpolation = discriminator(interpolates)  # stands for D_Y(y^)
-    fake_output = Variable(Tensor_gpu(real_sample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
+    # fake_output = Variable(Tensor_gpu(real_sample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
+    fake_output = Variable(Tensor_gpu(real_sample), requires_grad=False)
 
     gradients = autograd.grad(
         outputs=d_interpolation,
@@ -135,8 +136,8 @@ def compute_gradient_penalty(discriminator, real_sample, fake_sample):
     norm_gradients = gradients.norm(2, dim=1) - 1
     for i in range(len(norm_gradients)):
         if norm_gradients[i] > 0:
-            temp_data = Variable(norm_gradients[i].type(Tensor)).detach()
-            max_vals.append(temp_data.item())
+            temp_data = Variable(norm_gradients[i].type(Tensor)).detach().item()
+            max_vals.append(temp_data)
         else:
             max_vals.append(0)
 
@@ -144,7 +145,7 @@ def compute_gradient_penalty(discriminator, real_sample, fake_sample):
 
     # gradient_penalty = np.mean(max_vals)
     gradient_penalty = torch.mean(tensor_max_vals)
-    gradient_penalty.backward(retain_graph=True)
+    # gradient_penalty.backward(retain_graph=True)
     return gradient_penalty
 
 
