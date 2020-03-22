@@ -261,7 +261,7 @@ class Discriminator(nn.Module):
         x = self.conv7(x)
 
         x = self.fc(x)
-        
+
         return x
 
 
