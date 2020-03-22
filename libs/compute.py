@@ -135,12 +135,12 @@ def compute_gradient_penalty(discriminator, real_sample, fake_sample):
     norm_gradients = gradients.norm(2, dim=1) - 1
     for i in range(len(norm_gradients)):
         if norm_gradients[i] > 0:
-            temp_data = Variable(norm_gradients[i].type(Tensor)).detach().numpy()
-            max_vals.append(temp_data)
+            temp_data = Variable(norm_gradients[i].type(Tensor)).detach()
+            max_vals.append(temp_data.item())
         else:
             max_vals.append(0)
 
-    tensor_max_vals = torch.as_tensor(max_vals, dtype=torch.float64, device=device)
+    tensor_max_vals = torch.tensor(max_vals, dtype=torch.float64, device=device, requires_grad=True)
 
     # gradient_penalty = np.mean(max_vals)
     gradient_penalty = torch.mean(tensor_max_vals)
