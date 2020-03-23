@@ -30,15 +30,31 @@ Expert-C on [MIT-Adobe FiveK dataset](https://data.csail.mit.edu/graphics/fivek/
          3. Training2
    2. model：用来存放所有训练产生的文件，其下还需新建：
       1. gt_images
+         1. 1Way
+         2. 2Way
       2. input_images
+         1. 1Way
+         2. 2Way
       3. pretrain_checkpoint
+         1. 1Way
+         2. 2Way
       4. pretrain_images
+         1. 1Way
+         2. 2Way
       5. test_images
+         1. 1Way
+         2. 2Way
       6. train_checkpoint
+         1. 1Way
+         2. 2Way
       7. train_images
+         1. 1Way
+         2. 2Way
       8. train_test_images
+         1. 1Way
+         2. 2Way
    3. models:用来存放log_PreTraining.txt
-   4. 训练后的gan1_pretrain_XXx_xxx.pth需要放在SourceCode文件夹下
+   4. 训练后的gan1_pretrain_XXx_xxx.pth需要放在根目录下
 
 ## Cost Time
 
