@@ -131,6 +131,7 @@ def computeGradientPenaltyFor1WayGAN(D, realSample, fakeSample):
             maxVals.append(0)
 
     gradientPenalty = np.mean(maxVals)
+    gradients.backward(retain_graph=True)
     return gradientPenalty
 
 
@@ -238,14 +239,14 @@ def computeCycleConsistencyLoss(x, x2, y, y2):
     This function is used to compute the cycle consistency loss
     The equation is Equation(6) in Chp6
     :param x:
-    :param x1:
+    :param x2:
     :param y:
-    :param y1:
+    :param y2:
     :return:
     """
     # MSE Loss and Optimizer
     criterion = nn.MSELoss()
-    c_loss = criterion(x, y2).mean() + criterion(y, x2).mean()
+    c_loss = criterion(x, x2).mean() + criterion(y, y2).mean()
 
     return c_loss
 
@@ -262,8 +263,6 @@ def computeAdversarialLosses(discriminator, x, x1, y, y1):
     :param y1:
     :return:
     """
-    # MSE Loss and Optimizer
-    criterion = nn.MSELoss()
 
     dx = discriminator(x)
     dx1 = discriminator(x1)
@@ -289,8 +288,8 @@ def computeGradientPenaltyFor2Way(discriminator, x, x1, y, y1):
     :param y1:
     :return:
     """
-    gradient_penalty = compute_gradient_penalty(discriminator, x.data, y1.data) + \
-                       compute_gradient_penalty(discriminator, y.data, x1.data)
+    gradient_penalty = computeGradientPenaltyFor1WayGAN(discriminator, y.data, y1.data) + \
+                       computeGradientPenaltyFor1WayGAN(discriminator, x.data, x1.data)
 
     return gradient_penalty
 
