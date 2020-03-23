@@ -59,4 +59,8 @@ Expert-C on [MIT-Adobe FiveK dataset](https://data.csail.mit.edu/graphics/fivek/
 ## Cost Time
 
 - Pretrain: 3H55M  8H45M 9H25M
-- Train: 2H45M  2H49M 3H03M 5H38M(2Way)
+- Train: 2H45M  2H49M 3H03M 5H38M(2Way) 4H45M(2Way)
+
+## Problem 
+
+1. There may be a problem in computing the value of PSNR or not. It needs to be  proved.
