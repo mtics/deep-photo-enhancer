@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
             if batches_done % 50 == 0:
                 for k in range(0, fake_imgs.data.shape[0]):
-                    save_image(fake_imgs.data[k], "./models/train_images/2Way_Train_%d_%d_%d.png" % (epoch, batches_done, k),
+                    save_image(fake_imgs.data[k], "./models/train_images/2Way_Train_%d_%d_%d.png" % (epoch+1, batches_done+1, k+1),
                                nrow=1,
                                normalize=True)
                 torch.save(generator.state_dict(),
