@@ -86,17 +86,17 @@ if __name__ == "__main__":
 
             if batches_done % 50 == 0:
                 for k in range(0, fake_imgs.data.shape[0]):
-                    save_image(fake_imgs.data[k], "./models/train_images/1Way_Train_%d_%d_%d.png" % (epoch+1, batches_done+1, k+1),
+                    save_image(fake_imgs.data[k], "./models/train_images/1Way/1Way_Train_%d_%d_%d.png" % (epoch+1, batches_done+1, k+1),
                                nrow=1,
                                normalize=True)
                 torch.save(generator.state_dict(),
-                           './models/train_checkpoint/gan1_train_' + str(epoch+1) + '_' + str(i+1) + '.pth')
+                           './models/train_checkpoint/1Way/gan1_train_' + str(epoch+1) + '_' + str(i+1) + '.pth')
                 torch.save(discriminator.state_dict(),
-                           './models/train_checkpoint/discriminator_train_' + str(epoch+1) + '_' + str(i+1) + '.pth')
+                           './models/train_checkpoint/1Way/discriminator_train_' + str(epoch+1) + '_' + str(i+1) + '.pth')
                 fake_test_imgs = generator(testInput)
                 for k in range(0, fake_test_imgs.data.shape[0]):
                     save_image(fake_test_imgs.data[k],
-                               "./models/train_test_images/1Way_Train_Test_%d_%d_%d.png" % (epoch+1,batches_done+1, k+1),
+                               "./models/train_test_images/1Way/1Way_Train_Test_%d_%d_%d.png" % (epoch+1,batches_done+1, k+1),
                                nrow=1, normalize=True)
 
             batches_done += 1
@@ -119,17 +119,17 @@ if __name__ == "__main__":
             if batches_done >= 95:
                 for k in range(0, output.data.shape[0]):
                     save_image(output.data[k],
-                               "./models/test_images/test_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
+                               "./models/test_images/1Way/test_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
                                nrow=1,
                                normalize=True)
                 for k in range(0, real_imgs.data.shape[0]):
                     save_image(real_imgs.data[k],
-                               "./models/gt_images/gt_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
+                               "./models/gt_images/1Way/gt_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
                                nrow=1,
                                normalize=True)
                 for k in range(0, trainInput.data.shape[0]):
                     save_image(trainInput.data[k],
-                               "./models/input_images/input_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1), nrow=1,
+                               "./models/input_images/1Way/input_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1), nrow=1,
                                normalize=True)
 
             batches_done += 5

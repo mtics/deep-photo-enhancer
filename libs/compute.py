@@ -131,7 +131,6 @@ def computeGradientPenaltyFor1WayGAN(D, realSample, fakeSample):
             maxVals.append(0)
 
     gradientPenalty = np.mean(maxVals)
-    gradients.backward(retain_graph=True)
     return gradientPenalty
 
 

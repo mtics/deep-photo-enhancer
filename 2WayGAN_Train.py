@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # Creating generator and discriminator
     generator = Generator()
     generator = nn.DataParallel(generator)
-    generator.load_state_dict(torch.load('./gan1_pretrain_55_87.pth'))
+    generator.load_state_dict(torch.load('./gan1_pretrain_100_113.pth'))
     generator.train()
 
     discriminator = Discriminator()
@@ -63,9 +63,9 @@ if __name__ == "__main__":
             dx1 = discriminator(x1)             # stands for D_X'
 
             ad, ag = computeAdversarialLosses(discriminator, trainInput, x1, realImgs, fake_imgs)
-            ad.backward(retain_graph=True)
+            # ad.backward(retain_graph=True)
             gradient_penalty = computeGradientPenaltyFor2Way(discriminator, trainInput, x1, realImgs, fake_imgs)
-            gradient_penalty.backward(retain_graph=True)
+            # gradient_penalty.backward(retain_graph=True)
             d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
             d_loss.backward(retain_graph=True)
 
@@ -74,13 +74,15 @@ if __name__ == "__main__":
             if batches_done % 50 == 0:
                 # TRAIN GENERATOR
                 generator.zero_grad()
-                ag.backward(retain_graph=True)
                 i_loss = computeIdentityMappingLoss(trainInput, x1, realImgs, fake_imgs)
-                i_loss.backward(retain_graph=True)
                 c_loss = computeCycleConsistencyLoss(trainInput, x2, realImgs, y2)
-                c_loss.backward(retain_graph=True)
                 g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
+
+                # ag.backward(retain_graph=True)
+                # i_loss.backward(retain_graph=True)
+                # c_loss.backward(retain_graph=True)
                 g_loss.backward(retain_graph=True)
+
                 optimizer_g.step()
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]" % (
@@ -93,17 +95,17 @@ if __name__ == "__main__":
 
             if batches_done % 50 == 0:
                 for k in range(0, fake_imgs.data.shape[0]):
-                    save_image(fake_imgs.data[k], "./models/train_images/2Way_Train_%d_%d_%d.png" % (epoch+1, batches_done+1, k+1),
+                    save_image(fake_imgs.data[k], "./models/train_images/2Way/2Way_Train_%d_%d_%d.png" % (epoch+1, batches_done+1, k+1),
                                nrow=1,
                                normalize=True)
                 torch.save(generator.state_dict(),
-                           './models/train_checkpoint/gan2_train_' + str(epoch) + '_' + str(i) + '.pth')
+                           './models/train_checkpoint/2Way/gan2_train_' + str(epoch) + '_' + str(i) + '.pth')
                 torch.save(discriminator.state_dict(),
-                           './models/train_checkpoint/discriminator2_train_' + str(epoch) + '_' + str(i) + '.pth')
+                           './models/train_checkpoint/2Way/discriminator2_train_' + str(epoch) + '_' + str(i) + '.pth')
                 fake_test_imgs = generator(testInput)
                 for k in range(0, fake_test_imgs.data.shape[0]):
                     save_image(fake_test_imgs.data[k],
-                               "./models/train_test_images/2Way_Train_Test_%d_%d_%d.png" % (epoch, batches_done, k),
+                               "./models/train_test_images/2Way/2Way_Train_Test_%d_%d_%d.png" % (epoch, batches_done, k),
                                nrow=1, normalize=True)
 
             batches_done += 1
@@ -125,17 +127,17 @@ if __name__ == "__main__":
 
             for k in range(0, output.data.shape[0]):
                 save_image(output.data[k],
-                           "./models/test_images/test_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
+                           "./models/test_images/2Way/test_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
                            nrow=1,
                            normalize=True)
             for k in range(0, realImgs.data.shape[0]):
                 save_image(realImgs.data[k],
-                           "./models/gt_images/gt_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
+                           "./models/gt_images/2Way/gt_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1),
                            nrow=1,
                            normalize=True)
             for k in range(0, trainInput.data.shape[0]):
                 save_image(trainInput.data[k],
-                           "./models/input_images/input_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1), nrow=1,
+                           "./models/input_images/2Way/input_%d_%d_%d.png" % (batches_done + 1, j + 1, k + 1), nrow=1,
                            normalize=True)
 
             batches_done += 5
