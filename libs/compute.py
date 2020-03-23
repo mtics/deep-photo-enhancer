@@ -301,3 +301,14 @@ def computeDiscriminatorLossFor2WayGan(ad, penalty):
 
 def computeGeneratorLossFor2WayGan(ag, i_loss, c_loss):
     return -ag + ALPHA * i_loss + 10 * ALPHA * c_loss
+
+
+def adjustLearningRate(learning_rate, decay_rate, epoch_num):
+    """
+    Adjust Learning rate to get better performance
+    :param learning_rate:
+    :param decay_rate:
+    :param epoch_num:
+    :return:
+    """
+    return learning_rate / (1 + decay_rate * epoch_num)

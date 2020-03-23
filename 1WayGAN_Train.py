@@ -31,6 +31,8 @@ if __name__ == "__main__":
     optimizer_g = optim.Adam(generator.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
     optimizer_d = optim.Adam(discriminator.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
 
+    learning_rate = LEARNING_RATE
+
     # Training Network
     dataiter = iter(testLoader)
     gt_test, data_test = dataiter.next()
@@ -40,6 +42,10 @@ if __name__ == "__main__":
     generator_loss = []
     discriminator_loss = []
     for epoch in range(NUM_EPOCHS_TRAIN):
+
+        for param_group in optimizer_d.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
         for i, (data, gt1) in enumerate(trainLoader_cross, 0):
             input, dummy = data
             groundTruth, dummy = gt1
@@ -61,6 +67,9 @@ if __name__ == "__main__":
             optimizer_d.step()
 
             if batches_done % 50 == 0:
+                for param_group in optimizer_g.param_groups:
+                    param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
                 # TRAIN GENERATOR
                 optimizer_g.zero_grad()
                 gLoss = computeGeneratorLoss(trainInput, fake_imgs, discriminator, criterion)
