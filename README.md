@@ -6,7 +6,7 @@ This project is based on the thesis《Deep Photo Enhancer: Unpaired Learning for
 
 The author's project address is：[nothinglo/Deep-Photo-Enhancer](https://github.com/nothinglo/Deep-Photo-Enhancer)
 
-中文文档说明请看[这里]()
+中文文档说明请看[这里](https://github.com/mtics/deep-photo-enhancer/blob/master/README_zh_cn.md)
 
 ## Prerequisites
 
