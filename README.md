@@ -1,60 +1,49 @@
-# 代码运行文档
+## The Pytorch Implementation of Deep Photo Enhancer
 
-## 复现代码
+## Introduction
 
-本代码根据论文《Deep Photo Enhancer: Unpaired Learning for Image Enhancement from Photographs with GANs》。
+This project is based on the thesis《Deep Photo Enhancer: Unpaired Learning for Image Enhancement from Photographs with GANs》。
 
-原作者代码库：[nothinglo/Deep-Photo-Enhancer](https://github.com/nothinglo/Deep-Photo-Enhancer)
+The author's project address is：[nothinglo/Deep-Photo-Enhancer](https://github.com/nothinglo/Deep-Photo-Enhancer)
 
-## 所需环境
+中文文档说明请看[这里]()
+
+## Prerequisites
 
 - Python 3.6
 - CUDA 10.0
-- 具体见requirements.txt，使用如下命令安装依赖：
-`pip install -r requirements.txt`
+- The needed packages are listed in `requirements.txt`，please use the following command to install：
+  `pip install -r requirements.txt`
 
-## 所需数据集
+## Data Preparation
 
 Expert-C on [MIT-Adobe FiveK dataset](https://data.csail.mit.edu/graphics/fivek/)
 
-## 部分操作
+## Preparation
 
-1. PreTrain和Train中的参数可以修改
-2. 在SourceCode下要新建多个文件夹，分为：
-   1. images_LR：用来存放数据集
-      1. Expert-C
-      2. input
-      3. 上述两文件夹中都需要新建下面三个文件夹
-         1. Testing
-         2. Training1
-         3. Training2
-   2. model：用来存放所有训练产生的文件，其下还需新建：
-      1. gt_images
-         1. 1Way
-         2. 2Way
-      2. input_images
-         1. 1Way
-         2. 2Way
-      3. pretrain_checkpoint
-         1. 1Way
-         2. 2Way
-      4. pretrain_images
-         1. 1Way
-         2. 2Way
-      5. test_images
-         1. 1Way
-         2. 2Way
-      6. train_checkpoint
-         1. 1Way
-         2. 2Way
-      7. train_images
-         1. 1Way
-         2. 2Way
-      8. train_test_images
-         1. 1Way
-         2. 2Way
-   3. models:用来存放log_PreTraining.txt
-   4. 训练后的gan1_pretrain_XXx_xxx.pth需要放在根目录下
+1. All hyperparameters are in `libs\constant.py`
+2. There are some folders need to be created:
+   1. `images_LR`：Used to store datasets
+      1. `Expert-C`
+      2. `input`
+      3. In each of the above two folders, the following three new folders need to be created:
+         1. `Testing`
+         2. `Training1`
+         3. `Training2`
+   2. `models`：Used to store all the training generated files：
+      1. `gt_images`
+      2. `input_images`
+      3. `pretrain_checkpoint`
+      4. `pretrain_images`
+      5. `test_images`
+      6. `train_checkpoint`
+      7. `train_images`
+      8. `train_test_images`
+      9. In each of the above folders, the following two new folders need to be created:
+         1. `1Way`
+         2. `2Way`
+   3. `model`: Used to store `log_PreTraining.txt`
+   4. The last generated `gan1_pretrain_xxx_xxx.pth` should be placed in the root directory.
 
 ## Cost Time
 
@@ -64,3 +53,4 @@ Expert-C on [MIT-Adobe FiveK dataset](https://data.csail.mit.edu/graphics/fivek/
 ## Problem 
 
 1. There may be a problem in computing the value of PSNR or not. It needs to be  proved.
+2. The compute functions in `libs\compute.py` are wrong, which cause the discriminator loss cannot converge and the output is awful.
