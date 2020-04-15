@@ -44,12 +44,13 @@ if __name__ == "__main__":
             enhanced = Variable(enhanced_image.type(Tensor_gpu))        # Y
 
             optimizer_g_xy.zero_grad()
-            optimizer_g_yx.zero_grad()
 
             generated_enhanced_image = generator_xy(unenhanced)   # X->Y'
             loss_xy = criterion(generated_enhanced_image, enhanced)
             loss_xy.backward()
             optimizer_g_xy.step()
+
+            optimizer_g_yx.zero_grad()
 
             generated_unenhanced_image = generator_yx(enhanced)   # Y->X'
             loss_yx = criterion(generated_unenhanced_image, enhanced)
@@ -62,20 +63,17 @@ if __name__ == "__main__":
             running_losslist_xy.append(loss_xy.item())
             running_losslist_yx.append(loss_yx.item())
 
-            f = open("./models/log_xy_PreTraining.txt", "a+")
-            f.write("[Epoch %d/%d] [Batch %d/%d] [G loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), loss_xy.item()))
-            f.close()
-
-            f = open("./models/log_yx_PreTraining.txt", "a+")
-            f.write("[Epoch %d/%d] [Batch %d/%d] [G loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), loss_yx.item()))
+            f = open("./models/log_PreTraining.txt", "a+")
+            f.write("[Epoch %d/%d] [Batch %d/%d] [G loss(xy): %f]  [G loss(yx): %f]\n" % (
+                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), loss_xy.item(), loss_yx.item()))
             f.close()
 
             # if i % 200 == 200:    # print every 200 mini-batches
             if i % 1 == 0:
-                print('[%d, %5d] loss_xy: %.5f' % (epoch + 1, i + 1, running_loss_xy / 5))
+                print('[%d, %5d] loss_xy: %.5f   loss_yx: %.5f' % (epoch + 1, i + 1, running_loss_xy / 5, running_loss_yx / 5))
                 running_loss_xy = 0.0
+                running_loss_xy = 0.0
+
                 save_image(generated_enhanced_image.data,
                            "./models/pretrain_images/xy/gan2_pretrain_%d_%d.png" % (epoch + 1, i + 1),
                            nrow=8,
@@ -83,8 +81,6 @@ if __name__ == "__main__":
                 torch.save(generator_xy.state_dict(),
                            './models/pretrain_checkpoint/xy/gan2_pretrain_' + str(epoch + 1) + '_' + str(i + 1) + '.pth')
 
-                print('[%d, %5d] loss_yx: %.5f' % (epoch + 1, i + 1, running_loss_yx / 5))
-                running_loss_xy = 0.0
                 save_image(generated_unenhanced_image.data,
                            "./models/pretrain_images/yx/gan2_pretrain_%d_%d.png" % (epoch + 1, i + 1),
                            nrow=8,
