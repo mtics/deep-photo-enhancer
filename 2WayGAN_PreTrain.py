@@ -53,7 +53,7 @@ if __name__ == "__main__":
             optimizer_g_yx.zero_grad()
 
             generated_unenhanced_image = generator_yx(enhanced)   # Y->X'
-            loss_yx = criterion(generated_unenhanced_image, enhanced)
+            loss_yx = criterion(generated_unenhanced_image, unenhanced)
             loss_yx.backward()
             optimizer_g_yx.step()
 
