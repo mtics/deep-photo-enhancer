@@ -106,10 +106,10 @@ def data_loader():
 #     return gradient_penalty
 
 
-def computeGradientPenaltyFor1WayGAN(D, realSample, fakeSample):
+def computeGradientPenaltyFor1WayGAN(discriminator, realSample, fakeSample):
     alpha = Tensor_gpu(np.random.random((realSample.shape)))
     interpolates = (alpha * realSample + ((1 - alpha) * fakeSample)).requires_grad_(True)
-    dInterpolation = D(interpolates)
+    dInterpolation = discriminator(interpolates)
     fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
 
     gradients = autograd.grad(
@@ -250,47 +250,23 @@ def computeCycleConsistencyLoss(x, x2, y, y2):
     return c_loss
 
 
-def computeAdversarialLosses(discriminator, x, x1, y, y1):
+def computeAdversarialLosses(dx, dx1, dy, dy1):
     """
     This function is used to compute the adversarial losses
     for the discriminator and the generator
     The equations are Equation(7)(8)(9) in Chp6
-    :param discriminator:
     :param x:
     :param x1:
     :param y:
     :param y1:
     :return:
     """
-
-    dx = discriminator(x)
-    dx1 = discriminator(x1)
-    dy = discriminator(y)
-    dy1 = discriminator(y1)
 
     ad = torch.mean(dx) - torch.mean(dx1) + \
          torch.mean(dy) - torch.mean(dy1)
     ag = torch.mean(dx1) + torch.mean(dy1)
 
     return ad, ag
-
-
-def computeGradientPenaltyFor2Way(discriminator, x, x1, y, y1):
-    """
-    This function is used to compute the gradient penalty for 2-Way GAN
-    The equations are Equation(10)(11) in Chp6
-    :param generator:
-    :param discriminator:
-    :param x:
-    :param x1:
-    :param y:
-    :param y1:
-    :return:
-    """
-    gradient_penalty = computeGradientPenaltyFor1WayGAN(discriminator, y.data, y1.data) + \
-                       computeGradientPenaltyFor1WayGAN(discriminator, x.data, x1.data)
-
-    return gradient_penalty
 
 
 def computeDiscriminatorLossFor2WayGan(ad, penalty):
