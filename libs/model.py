@@ -253,7 +253,7 @@ class Discriminator(nn.Module):
         x = self.conv6(x)
 
         # input 16x16x128 to output 1x1x1
-        # x = self.conv7(x)
+        x = self.conv7(x)
 
         x = self.fc(x)
 
