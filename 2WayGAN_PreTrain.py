@@ -32,36 +32,35 @@ if __name__ == "__main__":
     ### GENERATOR PRE-TRAINING LOOP
     print("Pre-training loop starting")
     batches_done = 0
-    running_loss_xy = 0.0
-    running_loss_yx = 0.0
-    running_losslist_xy = []
-    running_losslist_yx = []
+    running_loss = 0.0
+    running_losslist = []
     for epoch in range(NUM_EPOCHS_PRETRAIN):
         for i, (target, input) in enumerate(trainLoader1, 0):
             unenhanced_image = input[0]
             enhanced_image = target[0]
-            unenhanced = Variable(unenhanced_image.type(Tensor_gpu))    # X
-            enhanced = Variable(enhanced_image.type(Tensor_gpu))        # Y
+            x = Variable(unenhanced_image.type(Tensor_gpu))  # X
+            y = Variable(enhanced_image.type(Tensor_gpu))  # Y
 
             optimizer_g_xy.zero_grad()
-
-            generated_enhanced_image = generator_xy(unenhanced)   # X->Y'
-            loss_xy = criterion(generated_enhanced_image, enhanced)
-            loss_xy.backward()
-            optimizer_g_xy.step()
-
             optimizer_g_yx.zero_grad()
 
-            generated_unenhanced_image = generator_yx(enhanced)   # Y->X'
-            loss_yx = criterion(unenhanced, generated_unenhanced_image)
-            loss_yx.backward()
+            y1 = generator_xy(x)  # X->Y'
+            x1 = generator_yx(y)  # Y->X'
+
+            x2 = generator_yx(y1)  # X''
+            y2 = generator_xy(x1)  # Y''
+
+            i_loss = computeIdentityMappingLoss(x, x1, y, y1)
+            c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
+            g_loss = ALPHA * i_loss + 10 * ALPHA * c_loss
+            g_loss.backward()
+
+            optimizer_g_xy.step()
             optimizer_g_yx.step()
 
             # Print statistics
-            running_loss_xy += loss_xy.item()
-            running_loss_yx += loss_yx.item()
-            running_losslist_xy.append(loss_xy.item())
-            running_losslist_yx.append(loss_yx.item())
+            running_loss += g_loss.item()
+            running_losslist.append(g_loss.item())
 
             f = open("./models/log_PreTraining.txt", "a+")
             f.write("[Epoch %d/%d] [Batch %d/%d] [G loss(xy): %f]  [G loss(yx): %f]\n" % (
@@ -70,33 +69,31 @@ if __name__ == "__main__":
 
             # if i % 200 == 200:    # print every 200 mini-batches
             if i % 1 == 0:
-                print('[%d, %5d] loss_xy: %.5f   loss_yx: %.5f' % (epoch + 1, i + 1, running_loss_xy / 5, running_loss_yx / 5))
-                running_loss_xy = 0.0
-                running_loss_xy = 0.0
+                print('[%d, %5d] loss: %.5f' % (
+                epoch + 1, i + 1, running_loss / 5))
+                running_loss = 0.0
 
-                save_image(generated_enhanced_image.data,
+                save_image(y1.data,
                            "./models/pretrain_images/xy/gan2_pretrain_%d_%d.png" % (epoch + 1, i + 1),
                            nrow=8,
                            normalize=True)
                 torch.save(generator_xy.state_dict(),
-                           './models/pretrain_checkpoint/xy/gan2_pretrain_' + str(epoch + 1) + '_' + str(i + 1) + '.pth')
+                           './models/pretrain_checkpoint/xy/gan2_pretrain_' + str(epoch + 1) + '_' + str(
+                               i + 1) + '.pth')
 
-                save_image(generated_unenhanced_image.data,
+                save_image(x1.data,
                            "./models/pretrain_images/yx/gan2_pretrain_%d_%d.png" % (epoch + 1, i + 1),
                            nrow=8,
                            normalize=True)
                 torch.save(generator_yx.state_dict(),
-                           './models/pretrain_checkpoint/yx/gan2_pretrain_' + str(epoch + 1) + '_' + str(i + 1) + '.pth')
+                           './models/pretrain_checkpoint/yx/gan2_pretrain_' + str(epoch + 1) + '_' + str(
+                               i + 1) + '.pth')
 
     end_time = datetime.now()
-    print(end_time-start_time)
+    print(end_time - start_time)
 
-    f = open("./models/log_xy_PreTraining_LossList.txt", "a+")
-    for item in running_losslist_xy:
+    f = open("./models/log_PreTraining_LossList.txt", "a+")
+    for item in running_losslist:
         f.write('%f\n' % item)
     f.close()
 
-    f = open("./models/log__yxPreTraining_LossList.txt", "a+")
-    for item in running_losslist_yx:
-        f.write('%f\n' % item)
-    f.close()
