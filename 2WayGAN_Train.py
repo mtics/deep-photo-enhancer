@@ -12,11 +12,11 @@ if __name__ == "__main__":
     # Creating generator and discriminator
     generator_xy = Generator()
     generator_xy = nn.DataParallel(generator_xy)
-    generator_xy.load_state_dict(torch.load('./gan2_pretrain_52_113_xy.pth'))
+    generator_xy.load_state_dict(torch.load('./gan2_pretrain_50_12_xy.pth'))
 
     generator_yx = Generator()
     generator_yx = nn.DataParallel(generator_yx)
-    generator_yx.load_state_dict(torch.load('./gan2_pretrain_53_5_yx.pth'))
+    generator_yx.load_state_dict(torch.load('./gan2_pretrain_50_12_yx.pth'))
 
     generator_xy.train()
     generator_yx.train()
