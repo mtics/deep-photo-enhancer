@@ -226,12 +226,12 @@ class Discriminator(nn.Module):
         )
 
         # input 16x16x128  output 1x1x128
-        # self.conv7 = nn.Sequential(
-        #     nn.Conv2d(128, 128, 16),
-        #     nn.LeakyReLU(inplace=True)
-        # )
+        self.conv7 = nn.Sequential(
+            nn.Conv2d(128, 128, 16),
+            nn.LeakyReLU(inplace=True)
+        )
 
-        self.fc = nn.Linear(16, 1)
+        self.fc = nn.Linear(1, 1)
 
     def forward(self, x):
         # input 512x512x3 to output 512x512x16
