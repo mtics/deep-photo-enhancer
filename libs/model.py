@@ -231,7 +231,7 @@ class Discriminator(nn.Module):
         #     nn.LeakyReLU(inplace=True)
         # )
 
-        self.fc = nn.Linear(32768, 1)
+        self.fc = nn.Linear(16, 1)
 
     def forward(self, x):
         # input 512x512x3 to output 512x512x16
