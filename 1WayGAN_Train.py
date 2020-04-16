@@ -62,7 +62,7 @@ if __name__ == "__main__":
             fakeValid = discriminator(fake_imgs)
 
             gradientPenalty = computeGradientPenaltyFor1WayGAN(discriminator, real_imgs.data, fake_imgs.data)
-            dLoss = discriminatorLoss(realValid, fakeValid, gradientPenalty)
+            dLoss = computeDiscriminatorLoss(realValid, fakeValid, gradientPenalty)
             dLoss.backward(retain_graph=True)
             optimizer_d.step()
 

@@ -189,7 +189,7 @@ def generatorAdversarialLoss(output_images, discriminator):
     return gen_adv_loss
 
 
-def discriminatorLoss(d1Real, d1Fake, gradPenalty):
+def computeDiscriminatorLoss(d1Real, d1Fake, gradPenalty):
     """
     This function is used to compute Discriminator Loss E[D(x)]
     :param d1Real:
@@ -228,7 +228,7 @@ def computeIdentityMappingLoss(x, x1, y, y1):
     """
     # MSE Loss and Optimizer
     criterion = nn.MSELoss()
-    i_loss = criterion(x, y1).mean() + criterion(y, x1).mean()
+    i_loss = criterion(x, y1) + criterion(y, x1)
 
     return i_loss
 
@@ -245,7 +245,7 @@ def computeCycleConsistencyLoss(x, x2, y, y2):
     """
     # MSE Loss and Optimizer
     criterion = nn.MSELoss()
-    c_loss = criterion(x, x2).mean() + criterion(y, y2).mean()
+    c_loss = criterion(x, x2) + criterion(y, y2)
 
     return c_loss
 
