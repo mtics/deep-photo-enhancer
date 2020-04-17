@@ -107,12 +107,23 @@ if __name__ == "__main__":
                 optimizer_g_xy.step()
                 optimizer_g_yx.step()
 
-            print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]  [I loss: %f]  [C loss: %f]" % (
+            print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(), c_loss.item()))
 
             f = open("./models/log_Train.txt", "w")
-            f.write("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]  [I loss: %f]  [C loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(), c_loss.item()))
+            f.write("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f] [AD: %f] [AG: %f] [GP: %f]\n" % (
+                epoch + 1,
+                NUM_EPOCHS_TRAIN,
+                i + 1,
+                len(trainLoader_cross),
+                d_loss.item(),
+                g_loss.item(),
+                i_loss.item(),
+                c_loss.item(),
+                ad.item(),
+                ag.item(),
+                gradient_penalty
+            ))
             f.close()
 
             if batches_done % 50 == 0:
