@@ -23,13 +23,13 @@ if __name__ == "__main__":
     # Loading Training and Test Set Data
     trainLoader1, trainLoader2, trainLoader_cross, testLoader = data_loader()
 
-    ### MSE Loss and Optimizer
+    # MSE Loss and Optimizer
     criterion = nn.MSELoss()
 
     optimizer_g_xy = optim.Adam(generator_xy.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
     optimizer_g_yx = optim.Adam(generator_yx.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
 
-    ### GENERATOR PRE-TRAINING LOOP
+    # GENERATOR PRE-TRAINING LOOP
     print("Pre-training loop starting")
     batches_done = 0
     running_loss = 0.0
@@ -64,13 +64,13 @@ if __name__ == "__main__":
 
             f = open("./models/log_PreTraining.txt", "a+")
             f.write("[Epoch %d/%d] [Batch %d/%d] [G loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1),g_loss.item()))
+                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g_loss.item()))
             f.close()
 
             # if i % 200 == 200:    # print every 200 mini-batches
             if i % 1 == 0:
                 print('[%d, %5d] loss: %.5f' % (
-                epoch + 1, i + 1, running_loss / 5))
+                    epoch + 1, i + 1, running_loss / 5))
                 running_loss = 0.0
 
                 save_image(y1.data,
@@ -96,4 +96,3 @@ if __name__ == "__main__":
     for item in running_losslist:
         f.write('%f\n' % item)
     f.close()
-

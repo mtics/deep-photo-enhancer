@@ -100,20 +100,17 @@ if __name__ == "__main__":
                 c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
                 g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
 
-                # ag.backward(retain_graph=True)
-                # i_loss.backward(retain_graph=True)
-                # c_loss.backward(retain_graph=True)
                 g_loss.backward(retain_graph=True)
 
                 optimizer_g_xy.step()
                 optimizer_g_yx.step()
 
-            print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]" % (
-                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item()))
+            print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]  [I loss: %f]  [C loss: %f]" % (
+                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(), c_loss.item()))
 
             f = open("./models/log_Train.txt", "a+")
-            f.write("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item()))
+            f.write("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]  [I loss: %f]  [C loss: %f]\n" % (
+                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(), c_loss.item()))
             f.close()
 
             if batches_done % 50 == 0:
