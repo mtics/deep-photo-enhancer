@@ -59,7 +59,6 @@ if __name__ == "__main__":
             optimizer_g_yx.step()
 
             # Print statistics
-            running_loss += g_loss.item()
             running_losslist.append(g_loss.item())
 
             f = open("./models/log_PreTraining.txt", "a+")
@@ -71,9 +70,6 @@ if __name__ == "__main__":
 
             # if i % 200 == 200:    # print every 200 mini-batches
             if i % 1 == 0:
-                print('[%d, %5d] loss: %.5f' % (
-                    epoch + 1, i + 1, running_loss / 5))
-                running_loss = 0.0
 
                 save_image(y1.data,
                            "./models/pretrain_images/xy/gan2_pretrain_%d_%d.png" % (epoch + 1, i + 1),
