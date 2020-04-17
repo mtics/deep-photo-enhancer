@@ -3,7 +3,7 @@ from torchvision.utils import save_image
 from _datetime import datetime
 from libs.compute import *
 from libs.constant import *
-from libs.model import *
+from libs.old_model import *
 
 if __name__ == "__main__":
 
