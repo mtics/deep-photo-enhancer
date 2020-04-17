@@ -89,6 +89,8 @@ if __name__ == "__main__":
             # gradient_penalty.backward(retain_graph=True)
             d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
             d_loss.backward(retain_graph=True)
+            ad.backward(retain_graph=True)
+            ag.backward(retain_graph=True)
 
             optimizer_d_xy.step()
             optimizer_d_yx.step()

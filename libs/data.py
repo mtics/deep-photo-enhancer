@@ -7,6 +7,9 @@ def data_visualization(file_path, save_path):
     c_losses = list()
     g_losses = list()
     d_losses = list()
+    ads = list()
+    ags = list()
+    gps = list()
 
     with open(file_path) as file:
         for line in file:
@@ -31,6 +34,12 @@ def data_visualization(file_path, save_path):
                         g_losses.append(value)
                     elif name == "D loss":
                         d_losses.append(value)
+                    elif name == "AD":
+                        ads.append(value)
+                    elif name == "AG":
+                        ags.append(value)
+                    elif name == "GP":
+                        gps.append(value)
 
     x_list = list()
     for i in range(0, 601):
@@ -55,3 +64,18 @@ def data_visualization(file_path, save_path):
     line.add_xaxis(x_list)
     line.add_yaxis("D Loss", d_losses)
     line.render(save_path+"data_P_D.html")
+
+    line = Line()
+    line.add_xaxis(x_list)
+    line.add_yaxis("AD", ads)
+    line.render(save_path+"data_P_AD.html")
+
+    line = Line()
+    line.add_xaxis(x_list)
+    line.add_yaxis("AG", ags)
+    line.render(save_path+"data_P_AG.html")
+
+    line = Line()
+    line.add_xaxis(x_list)
+    line.add_yaxis("GP", gps)
+    line.render(save_path+"data_P_GP.html")
