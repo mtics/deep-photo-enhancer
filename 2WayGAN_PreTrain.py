@@ -63,8 +63,10 @@ if __name__ == "__main__":
             running_losslist.append(g_loss.item())
 
             f = open("./models/log_PreTraining.txt", "a+")
-            f.write("[Epoch %d/%d] [Batch %d/%d] [G loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g_loss.item()))
+            f.write("[Epoch %d/%d] [Batch %d/%d] [G loss: %f] [I loss: %f] [C loss: %f]\n" % (
+                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g_loss.item(), i_loss.item(), c_loss.item()))
+            print("[Epoch %d/%d] [Batch %d/%d] [G loss: %f] [I loss: %f] [C loss: %f]\n" % (
+                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g_loss.item(), i_loss.item(), c_loss.item()))
             f.close()
 
             # if i % 200 == 200:    # print every 200 mini-batches
