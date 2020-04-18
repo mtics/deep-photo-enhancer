@@ -112,7 +112,7 @@ if __name__ == "__main__":
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(), c_loss.item()))
 
-            f = open("./models/log_Train.txt", "a+")
+            f = open("./models/log/log_Train.txt", "a+")
             f.write("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f] [AD: %f] [AG: %f] [GP: %f]\n" % (
                 epoch + 1,
                 NUM_EPOCHS_TRAIN,
@@ -184,9 +184,9 @@ if __name__ == "__main__":
             batches_done += 5
             print("Loss loss: %f" % loss)
             print("PSNR Avg: %f" % (psnrAvg / (j + 1)))
-            f = open("./models/psnr_Score.txt", "w")
+            f = open("./models/log/psnr_Score.txt", "w")
             f.write("PSNR Avg: %f" % (psnrAvg / (j + 1)))
-        f = open("./models/psnr_Score.txt", "w")
+        f = open("./models/log/psnr_Score.txt", "w")
         f.write("Final PSNR Avg: %f" % (psnrAvg / len(testLoader)))
         print("Final PSNR Avg: %f" % (psnrAvg / len(testLoader)))
 

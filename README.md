@@ -44,14 +44,21 @@ Expert-C on [MIT-Adobe FiveK dataset](https://data.csail.mit.edu/graphics/fivek/
       9. In each of the above folders, the following two new folders need to be created:
          1. `1Way`
          2. `2Way`
-   3. `model`: Used to store `log_PreTraining.txt`
+      10. `log`: used to store all logs and the result of data visualization
+          1. `pretrain`: store all charts of pretrain
+          2. `train`: store all charts of train
 
 ## Training
 
-1. If you don't have a pretrain module, the first thing you need to do is runing "1WayGAN_PreTrain.py":
+1. If you don't have a pretrain module, the first thing you need to do is running "1WayGAN_PreTrain.py":
    `python 1WayGAN_PreTrain.py`
+   
 2. The last generated `\models\pretrain_checkpoint\gan1_pretrain_xxx_xxx.pth` should be placed in the root directory, like "gan1_pretrain_100_113.pth" in my repository.
-3. Next you need to change the line 15 in “1WayGAN_Train.py” or the same line in “2WayGAN_Train.py”.  To train the model, please run this command:
+
+3. Next you need to change the line 15 in “1WayGAN_Train.py” or the same line in “2WayGAN_Train.py”.  
+   
+4. To train the model, please run this command:
+
    ```python
    # Only if you want to use 1 way Gan
    python 1WayGAN_Train.py
@@ -63,7 +70,7 @@ Expert-C on [MIT-Adobe FiveK dataset](https://data.csail.mit.edu/graphics/fivek/
 
 For now, the evaluation and training are simultaneous. So there is no need to run anything.
 
-To evaluate my modle, I use PSNR in “XWayGAN_Train.py”
+To evaluate my module, I use PSNR in “XWayGAN_Train.py”
 
 ## Results
 
@@ -179,4 +186,4 @@ This repo is released under  the [MIT License](LICENSE.md)
 
 For now, This repo is maintained by Zhiwei Li.
 
-Welcome to join me to maintenan it together.
+Welcome to join me to maintain it together.
