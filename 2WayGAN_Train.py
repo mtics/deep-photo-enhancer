@@ -14,11 +14,11 @@ if __name__ == "__main__":
     # Creating generator and discriminator
     generator_xy = Generator()
     generator_xy = nn.DataParallel(generator_xy)
-    generator_xy.load_state_dict(torch.load('./gan2_pretrain_50_113_xy.pth'))
+    # generator_xy.load_state_dict(torch.load('./gan2_pretrain_50_113_xy.pth'))
 
     generator_yx = Generator()
     generator_yx = nn.DataParallel(generator_yx)
-    generator_yx.load_state_dict(torch.load('./gan2_pretrain_50_113_yx.pth'))
+    # generator_yx.load_state_dict(torch.load('./gan2_pretrain_50_113_yx.pth'))
 
     discriminator_x = Discriminator()
     discriminator_x = nn.DataParallel(discriminator_x)
@@ -138,29 +138,30 @@ if __name__ == "__main__":
             ))
             f.close()
 
-            if batches_done % 50 == 0:
-                for k in range(0, y1.data.shape[0]):
-                    save_image(y1.data[k], "./models/train_images/2Way/2Way_Train_%d_%d_%d.png" % (
-                    epoch + 1, batches_done + 1, k + 1),
-                               nrow=1,
-                               normalize=True)
-                torch.save(generator_xy.state_dict(),
-                           './models/train_checkpoint/2Way/xy/gan2_train_' + str(epoch) + '_' + str(i) + '.pth')
-                torch.save(generator_yx.state_dict(),
-                           './models/train_checkpoint/2Way/yx/gan2_train_' + str(epoch) + '_' + str(i) + '.pth')
-                torch.save(discriminator_x.state_dict(),
-                           './models/train_checkpoint/2Way/xy/discriminator2_train_' + str(epoch) + '_' + str(i) + '.pth')
-                torch.save(discriminator_y.state_dict(),
-                           './models/train_checkpoint/2Way/yx/discriminator2_train_' + str(epoch) + '_' + str(i) + '.pth')
-                fake_test_imgs = generator_xy(testInput)
-                for k in range(0, fake_test_imgs.data.shape[0]):
-                    save_image(fake_test_imgs.data[k],
-                               "./models/train_test_images/2Way/2Way_Train_Test_%d_%d_%d.png" % (
-                               epoch, batches_done, k),
-                               nrow=1, normalize=True)
-
-            batches_done += 1
             print("Done training discriminator on iteration: %d" % i)
+
+        for k in range(0, y1.data.shape[0]):
+            save_image(
+                y1.data[k],
+                "./models/train_images/2Way/2Way_Train_%d_%d.png" % (epoch + 1, k + 1),
+                nrow=1,
+                normalize=True
+            )
+        torch.save(generator_xy.state_dict(),
+                   './models/train_checkpoint/2Way/xy/gan2_train_' + str(epoch) + '.pth')
+        torch.save(generator_yx.state_dict(),
+                   './models/train_checkpoint/2Way/yx/gan2_train_' + str(epoch) + '.pth')
+        torch.save(discriminator_x.state_dict(),
+                   './models/train_checkpoint/2Way/xy/discriminator2_train_' + str(epoch) + '.pth')
+        torch.save(discriminator_y.state_dict(),
+                   './models/train_checkpoint/2Way/yx/discriminator2_train_' + str(epoch) + '.pth')
+
+        fake_test_imgs = generator_xy(testInput)
+        for k in range(0, fake_test_imgs.data.shape[0]):
+            save_image(fake_test_imgs.data[k],
+                       "./models/train_test_images/2Way/2Way_Train_Test_%d_%d.png" % (
+                       epoch, k),
+                       nrow=1, normalize=True)
 
     # TEST NETWORK
     batches_done = 0
