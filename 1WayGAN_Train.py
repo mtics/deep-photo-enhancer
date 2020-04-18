@@ -43,23 +43,23 @@ if __name__ == "__main__":
     discriminator_loss = []
     for epoch in range(NUM_EPOCHS_TRAIN):
 
-        for param_group in optimizer_d.param_groups:
-            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+        # for param_group in optimizer_d.param_groups:
+        #     param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
 
         for i, (data, gt1) in enumerate(trainLoader_cross, 0):
             input, dummy = data
             groundTruth, dummy = gt1
-            trainInput = Variable(input.type(Tensor_gpu))
-            real_imgs = Variable(groundTruth.type(Tensor_gpu))
+            trainInput = Variable(input.type(Tensor_gpu))           # X
+            real_imgs = Variable(groundTruth.type(Tensor_gpu))      # Y
 
             # TRAIN DISCRIMINATOR
             optimizer_d.zero_grad()
-            fake_imgs = generator(trainInput)
+            fake_imgs = generator(trainInput)                       # Y'
 
             # Real Images
-            realValid = discriminator(real_imgs)
+            realValid = discriminator(real_imgs)                    # D_Y
             # Fake Images
-            fakeValid = discriminator(fake_imgs)
+            fakeValid = discriminator(fake_imgs)                    # D_Y'
 
             gradientPenalty = computeGradientPenaltyFor1WayGAN(discriminator, real_imgs.data, fake_imgs.data)
             dLoss = computeDiscriminatorLoss(realValid, fakeValid, gradientPenalty)
@@ -67,8 +67,8 @@ if __name__ == "__main__":
             optimizer_d.step()
 
             if batches_done % 50 == 0:
-                for param_group in optimizer_g.param_groups:
-                    param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+                # for param_group in optimizer_g.param_groups:
+                #     param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
 
                 # TRAIN GENERATOR
                 optimizer_g.zero_grad()

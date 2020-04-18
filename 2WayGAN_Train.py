@@ -75,21 +75,11 @@ if __name__ == "__main__":
             #     optimizer_g_xy.step()
             #     optimizer_g_yx.step()
 
-            # TRAIN GENERATOR
-            generator_xy.train()
-            generator_yx.train()
-
-            optimizer_g_xy.zero_grad()
-            optimizer_g_yx.zero_grad()
-
             y1 = generator_xy(x)  # Y'
             x1 = generator_yx(y)  # X'
 
             x2 = generator_yx(y1)  # X''
             y2 = generator_xy(x1)  # Y''
-
-            optimizer_g_xy.step()
-            optimizer_g_yx.step()
 
             # TRAIN DISCRIMINATOR
             optimizer_dx.zero_grad()
@@ -107,16 +97,28 @@ if __name__ == "__main__":
             # ad.backward(retain_graph=True)
             gradient_penalty = computeGradientPenaltyFor1WayGAN(discriminator_x, x.data, x1.data) + \
                                computeGradientPenaltyFor1WayGAN(discriminator_y, y.data, y1.data)
+
             d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
+            d_loss.backward(retain_graph=True)
+
+            optimizer_dx.step()
+            optimizer_dy.step()
+
+
+            # TRAIN GENERATOR
+            generator_xy.train()
+            generator_yx.train()
+
+            optimizer_g_xy.zero_grad()
+            optimizer_g_yx.zero_grad()
 
             i_loss = computeIdentityMappingLoss(x, x1, y, y1)
             c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
             g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
             g_loss.backward(retain_graph=True)
-            d_loss.backward(retain_graph=True)
 
-            optimizer_dx.step()
-            optimizer_dy.step()
+            optimizer_g_xy.step()
+            optimizer_g_yx.step()
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(), c_loss.item()))

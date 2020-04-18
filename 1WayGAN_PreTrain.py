@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
             generated_enhanced_image = generator(enhanced)
             loss = criterion(generated_enhanced_image, enhanced)
-            loss.backward()
+            loss.backward(retain_graph=True)
             optimizer_g.step()
 
             # Print statistics
@@ -56,11 +56,11 @@ if __name__ == "__main__":
                 print('[%d, %5d] loss: %.5f' % (epoch + 1, i + 1, running_loss / 5))
                 running_loss = 0.0
                 save_image(generated_enhanced_image.data,
-                           "./models/pretrain_images/gan1_pretrain_%d_%d.png" % (epoch + 1, i + 1),
+                           "./models/pretrain_images/1Way/gan1_pretrain_%d_%d.png" % (epoch + 1, i + 1),
                            nrow=8,
                            normalize=True)
                 torch.save(generator.state_dict(),
-                           './models/pretrain_checkpoint/gan1_pretrain_' + str(epoch + 1) + '_' + str(i + 1) + '.pth')
+                           './models/pretrain_checkpoint/1Way/gan1_pretrain_' + str(epoch + 1) + '_' + str(i + 1) + '.pth')
 
     end_time = datetime.now()
     print(end_time-start_time)
