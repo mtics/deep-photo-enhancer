@@ -107,7 +107,6 @@ if __name__ == "__main__":
             # ad.backward(retain_graph=True)
             gradient_penalty = computeGradientPenaltyFor1WayGAN(discriminator_x, x.data, x1.data) + \
                                computeGradientPenaltyFor1WayGAN(discriminator_y, y.data, y1.data)
-            gradient_penalty.backward(retain_graph=True)
             d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
 
             i_loss = computeIdentityMappingLoss(x, x1, y, y1)
@@ -134,7 +133,7 @@ if __name__ == "__main__":
                 c_loss.item(),
                 ad.item(),
                 ag.item(),
-                gradient_penalty
+                gradient_penalty.item()
             ))
             f.close()
 
