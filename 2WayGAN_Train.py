@@ -23,17 +23,17 @@ if __name__ == "__main__":
     generator_xy.train()
     generator_yx.train()
 
-    discriminator_xy = Discriminator()
-    discriminator_xy = nn.DataParallel(discriminator_xy)
+    discriminator_x = Discriminator()
+    discriminator_x = nn.DataParallel(discriminator_x)
 
-    discriminator_yx = Discriminator()
-    discriminator_yx = nn.DataParallel(discriminator_yx)
+    discriminator_y = Discriminator()
+    discriminator_y = nn.DataParallel(discriminator_y)
 
     if torch.cuda.is_available():
         generator_xy.cuda(device=device)
         generator_yx.cuda(device=device)
-        discriminator_xy.cuda(device=device)
-        discriminator_yx.cuda(device=device)
+        discriminator_x.cuda(device=device)
+        discriminator_y.cuda(device=device)
 
     # Loading Training and Test Set Data
     trainLoader1, trainLoader2, trainLoader_cross, testLoader = data_loader()
@@ -44,8 +44,8 @@ if __name__ == "__main__":
     optimizer_g_xy = optim.Adam(generator_xy.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
     optimizer_g_yx = optim.Adam(generator_yx.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
 
-    optimizer_d_xy = optim.Adam(discriminator_xy.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
-    optimizer_d_yx = optim.Adam(discriminator_yx.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
+    optimizer_d_xy = optim.Adam(discriminator_x.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
+    optimizer_d_yx = optim.Adam(discriminator_y.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
 
     # Training Network
     dataiter = iter(testLoader)
@@ -55,45 +55,14 @@ if __name__ == "__main__":
     batches_done = 0
     generator_xy_loss = []
     generator_yx_loss = []
-    discriminator_xy_loss = []
-    discriminator_yx_loss = []
+    discriminator_x_loss = []
+    discriminator_y_loss = []
     for epoch in range(NUM_EPOCHS_TRAIN):
         for i, (data, gt1) in enumerate(trainLoader_cross, 0):
             input, dummy = data
             groundTruth, dummy = gt1
-            x = Variable(input.type(Tensor_gpu))  # stands for X
-            y = Variable(groundTruth.type(Tensor_gpu))  # stands for Y
-
-            # TRAIN DISCRIMINATOR
-            discriminator_xy.zero_grad()
-            discriminator_yx.zero_grad()
-
-            y1 = generator_xy(x)  # Y'
-            x1 = generator_yx(y)  # X'
-
-            x2 = generator_yx(y1)  # X''
-            y2 = generator_xy(x1)  # Y''
-
-            # Real Images
-            dy = discriminator_xy(y)  # D_Y
-            # Fake Images
-            dy1 = discriminator_xy(y1)  # D_Y'
-
-            dx = discriminator_yx(x)  # D_X
-            dx1 = discriminator_yx(x1)  # D_X'
-
-            ad, ag = computeAdversarialLosses(dx, dx1, dy, dy1)
-            # ad.backward(retain_graph=True)
-            gradient_penalty = computeGradientPenaltyFor1WayGAN(discriminator_xy, y.data, y1.data) + \
-                                computeGradientPenaltyFor1WayGAN(discriminator_yx, x.data, x1.data)
-            # gradient_penalty.backward(retain_graph=True)
-            d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
-            d_loss.backward(retain_graph=True)
-            ad.backward(retain_graph=True)
-            ag.backward(retain_graph=True)
-
-            optimizer_d_xy.step()
-            optimizer_d_yx.step()
+            x = Variable(input.type(Tensor_gpu))  # X
+            y = Variable(groundTruth.type(Tensor_gpu))  # Y
 
             # if batches_done % 50 == 0:
             #     # TRAIN GENERATOR
@@ -113,6 +82,12 @@ if __name__ == "__main__":
             generator_xy.zero_grad()
             generator_yx.zero_grad()
 
+            y1 = generator_xy(x)  # Y'
+            x1 = generator_yx(y)  # X'
+
+            x2 = generator_yx(y1)  # X''
+            y2 = generator_xy(x1)  # Y''
+
             i_loss = computeIdentityMappingLoss(x, x1, y, y1)
             c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
             g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
@@ -122,6 +97,30 @@ if __name__ == "__main__":
             optimizer_g_xy.step()
             optimizer_g_yx.step()
 
+            # TRAIN DISCRIMINATOR
+            discriminator_x.zero_grad()
+            discriminator_y.zero_grad()
+
+            # Real Images
+            dy = discriminator_x(y)  # D_Y
+            # Fake Images
+            dy1 = discriminator_x(y1)  # D_Y'
+
+            dx = discriminator_y(x)  # D_X
+            dx1 = discriminator_y(x1)  # D_X'
+
+            ad, ag = computeAdversarialLosses(dx, dx1, dy, dy1)
+            # ad.backward(retain_graph=True)
+            gradient_penalty = computeGradientPenaltyFor1WayGAN(discriminator_x, y.data, y1.data) + \
+                               computeGradientPenaltyFor1WayGAN(discriminator_y, x.data, x1.data)
+            # gradient_penalty.backward(retain_graph=True)
+            d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
+            d_loss.backward(retain_graph=True)
+            ad.backward(retain_graph=True)
+            ag.backward(retain_graph=True)
+
+            optimizer_d_xy.step()
+            optimizer_d_yx.step()
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(), c_loss.item()))
@@ -152,9 +151,9 @@ if __name__ == "__main__":
                            './models/train_checkpoint/2Way/xy/gan2_train_' + str(epoch) + '_' + str(i) + '.pth')
                 torch.save(generator_yx.state_dict(),
                            './models/train_checkpoint/2Way/yx/gan2_train_' + str(epoch) + '_' + str(i) + '.pth')
-                torch.save(discriminator_xy.state_dict(),
+                torch.save(discriminator_x.state_dict(),
                            './models/train_checkpoint/2Way/xy/discriminator2_train_' + str(epoch) + '_' + str(i) + '.pth')
-                torch.save(discriminator_yx.state_dict(),
+                torch.save(discriminator_y.state_dict(),
                            './models/train_checkpoint/2Way/yx/discriminator2_train_' + str(epoch) + '_' + str(i) + '.pth')
                 fake_test_imgs = generator_xy(testInput)
                 for k in range(0, fake_test_imgs.data.shape[0]):
