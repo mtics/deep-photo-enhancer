@@ -3,5 +3,4 @@
 /models/*
 /libs/__pycache__/*
 
-!/models/log_Train.txt
-!/models/log_PreTraining.txt
+!/models/log/*
