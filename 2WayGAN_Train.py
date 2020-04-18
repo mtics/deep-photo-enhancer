@@ -105,8 +105,8 @@ if __name__ == "__main__":
 
             ad, ag = computeAdversarialLosses(dx, dx1, dy, dy1)
             # ad.backward(retain_graph=True)
-            gradient_penalty = computeGradientPenaltyFor1WayGAN(discriminator_x, y.data, y1.data) + \
-                               computeGradientPenaltyFor1WayGAN(discriminator_y, x.data, x1.data)
+            gradient_penalty = computeGradientPenaltyFor1WayGAN(discriminator_x, x.data, x1.data) + \
+                               computeGradientPenaltyFor1WayGAN(discriminator_y, y.data, y1.data)
             # gradient_penalty.backward(retain_graph=True)
             d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
 
