@@ -3,4 +3,4 @@
 /models/*
 /libs/__pycache__/*
 
-!/models/log/*
+! /models/log/*
