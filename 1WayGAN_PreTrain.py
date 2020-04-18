@@ -40,7 +40,7 @@ if __name__ == "__main__":
             optimizer_g.zero_grad()
 
             generated_enhanced_image = generator(enhanced)
-            loss = criterion(generated_enhanced_image, unenhanced)
+            loss = criterion(unenhanced, generated_enhanced_image)
             loss.backward(retain_graph=True)
             optimizer_g.step()
 
