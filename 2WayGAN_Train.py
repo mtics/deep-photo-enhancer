@@ -95,19 +95,33 @@ if __name__ == "__main__":
             optimizer_d_xy.step()
             optimizer_d_yx.step()
 
-            if batches_done % 50 == 0:
-                # TRAIN GENERATOR
-                generator_xy.zero_grad()
-                generator_yx.zero_grad()
+            # if batches_done % 50 == 0:
+            #     # TRAIN GENERATOR
+            #     generator_xy.zero_grad()
+            #     generator_yx.zero_grad()
+            #
+            #     i_loss = computeIdentityMappingLoss(x, x1, y, y1)
+            #     c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
+            #     g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
+            #
+            #     g_loss.backward(retain_graph=True)
+            #
+            #     optimizer_g_xy.step()
+            #     optimizer_g_yx.step()
 
-                i_loss = computeIdentityMappingLoss(x, x1, y, y1)
-                c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
-                g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
+            # TRAIN GENERATOR
+            generator_xy.zero_grad()
+            generator_yx.zero_grad()
 
-                g_loss.backward(retain_graph=True)
+            i_loss = computeIdentityMappingLoss(x, x1, y, y1)
+            c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
+            g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
 
-                optimizer_g_xy.step()
-                optimizer_g_yx.step()
+            g_loss.backward(retain_graph=True)
+
+            optimizer_g_xy.step()
+            optimizer_g_yx.step()
+
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(), c_loss.item()))
