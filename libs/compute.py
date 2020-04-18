@@ -162,7 +162,7 @@ def computeGradientPenaltyFor1WayGAN(discriminator, realSample, fakeSample):
         if normGradients[i] < 0:
             normGradients[i] = 0
 
-    gradientPenalty = torch.mean(normGradients)
+    gradientPenalty = normGradients.mean()
     return gradientPenalty
 
 
