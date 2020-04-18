@@ -47,7 +47,7 @@ if __name__ == "__main__":
             # Print statistics
             running_loss += loss.item()
             running_losslist.append(loss.item())
-            f = open("./models/log_PreTraining.txt", "a+")
+            f = open("./models/log/log_PreTraining.txt", "a+")
             f.write("[Epoch %d/%d] [Batch %d/%d] [G loss: %f]\n" % (
                 epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), loss.item()))
             f.close()
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     end_time = datetime.now()
     print(end_time-start_time)
 
-    f = open("./models/log_PreTraining_LossList.txt", "a+")
+    f = open("./models/log/log_PreTraining_LossList.txt", "a+")
     for item in running_losslist:
         f.write('%f\n' % item)
     f.close()

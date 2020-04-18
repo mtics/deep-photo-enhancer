@@ -226,13 +226,12 @@ class Discriminator(nn.Module):
         )
 
         # input 16x16x128  output 1x1x128
-        # the output of this layer we need layers for global features
         self.conv7 = nn.Sequential(
-            nn.Conv2d(128, 128, 16),
+            nn.Conv2d(128, 1, 16),
             nn.LeakyReLU(inplace=True)
         )
 
-        self.fc = nn.Linear(128, 1)
+        self.fc = nn.Linear(1, 1)
 
     def forward(self, x):
         # input 512x512x3 to output 512x512x16
@@ -255,8 +254,9 @@ class Discriminator(nn.Module):
 
         # input 16x16x128 to output 1x1x1
         x = self.conv7(x)
+        # print(x.shape)
 
-        x = self.fc(x)
+        # x = self.fc(x)
 
         return x
 

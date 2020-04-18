@@ -20,10 +20,18 @@ def data_loader():
     testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Testing/', transform=transform)
     trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training1/', transform=transform)
     trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training2/', transform=transform)
-
+    
     testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Testing/', transform=transform)
     trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training1/', transform=transform)
     trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training2/', transform=transform)
+
+    # testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Testing/', transform=transform)
+    # trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Training1/', transform=transform)
+    # trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Training2/', transform=transform)
+
+    # testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Testing/', transform=transform)
+    # trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Training1/', transform=transform)
+    # trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Training2/', transform=transform)
 
     train_loader_1 = torch.utils.data.DataLoader(
         ConcatDataset(
@@ -106,10 +114,10 @@ def data_loader():
 #     return gradient_penalty
 
 
-def computeGradientPenaltyFor1WayGAN(D, realSample, fakeSample):
+def computeGradientPenaltyFor1WayGAN(discriminator, realSample, fakeSample):
     alpha = Tensor_gpu(np.random.random((realSample.shape)))
     interpolates = (alpha * realSample + ((1 - alpha) * fakeSample)).requires_grad_(True)
-    dInterpolation = D(interpolates)
+    dInterpolation = discriminator(interpolates)
     fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
 
     gradients = autograd.grad(
@@ -189,7 +197,7 @@ def generatorAdversarialLoss(output_images, discriminator):
     return gen_adv_loss
 
 
-def discriminatorLoss(d1Real, d1Fake, gradPenalty):
+def computeDiscriminatorLoss(d1Real, d1Fake, gradPenalty):
     """
     This function is used to compute Discriminator Loss E[D(x)]
     :param d1Real:
@@ -228,7 +236,7 @@ def computeIdentityMappingLoss(x, x1, y, y1):
     """
     # MSE Loss and Optimizer
     criterion = nn.MSELoss()
-    i_loss = criterion(x, y1).mean() + criterion(y, x1).mean()
+    i_loss = criterion(x, y1) + criterion(y, x1)
 
     return i_loss
 
@@ -245,52 +253,28 @@ def computeCycleConsistencyLoss(x, x2, y, y2):
     """
     # MSE Loss and Optimizer
     criterion = nn.MSELoss()
-    c_loss = criterion(x, x2).mean() + criterion(y, y2).mean()
+    c_loss = criterion(x, x2) + criterion(y, y2)
 
     return c_loss
 
 
-def computeAdversarialLosses(discriminator, x, x1, y, y1):
+def computeAdversarialLosses(dx, dx1, dy, dy1):
     """
     This function is used to compute the adversarial losses
     for the discriminator and the generator
     The equations are Equation(7)(8)(9) in Chp6
-    :param discriminator:
     :param x:
     :param x1:
     :param y:
     :param y1:
     :return:
     """
-
-    dx = discriminator(x)
-    dx1 = discriminator(x1)
-    dy = discriminator(y)
-    dy1 = discriminator(y1)
 
     ad = torch.mean(dx) - torch.mean(dx1) + \
          torch.mean(dy) - torch.mean(dy1)
     ag = torch.mean(dx1) + torch.mean(dy1)
 
     return ad, ag
-
-
-def computeGradientPenaltyFor2Way(discriminator, x, x1, y, y1):
-    """
-    This function is used to compute the gradient penalty for 2-Way GAN
-    The equations are Equation(10)(11) in Chp6
-    :param generator:
-    :param discriminator:
-    :param x:
-    :param x1:
-    :param y:
-    :param y1:
-    :return:
-    """
-    gradient_penalty = computeGradientPenaltyFor1WayGAN(discriminator, y.data, y1.data) + \
-                       computeGradientPenaltyFor1WayGAN(discriminator, x.data, x1.data)
-
-    return gradient_penalty
 
 
 def computeDiscriminatorLossFor2WayGan(ad, penalty):

@@ -8,4 +8,5 @@ scipy==1.2.1
 six==1.10.0
 torchvision==0.4.2
 cudatoolkit==10.0.130
+pyecharts==1.7.1
 

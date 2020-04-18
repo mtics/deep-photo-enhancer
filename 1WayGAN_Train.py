@@ -62,7 +62,7 @@ if __name__ == "__main__":
             fakeValid = discriminator(fake_imgs)
 
             gradientPenalty = computeGradientPenaltyFor1WayGAN(discriminator, real_imgs.data, fake_imgs.data)
-            dLoss = discriminatorLoss(realValid, fakeValid, gradientPenalty)
+            dLoss = computeDiscriminatorLoss(realValid, fakeValid, gradientPenalty)
             dLoss.backward(retain_graph=True)
             optimizer_d.step()
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), dLoss.item(), gLoss.item()))
 
-            f = open("./models/log_Train.txt", "a+")
+            f = open("./models/log/log_Train.txt", "a+")
             f.write("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]\n" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), dLoss.item(), gLoss.item()))
             f.close()
@@ -135,9 +135,9 @@ if __name__ == "__main__":
             batches_done += 5
             print("Loss loss: %f" % loss)
             print("PSNR Avg: %f" % (psnrAvg / (j + 1)))
-            f = open("./models/psnr_Score.txt", "a+")
+            f = open("./models/log/psnr_Score.txt", "a+")
             f.write("PSNR Avg: %f" % (psnrAvg / (j + 1)))
-        f = open("./models/psnr_Score.txt", "a+")
+        f = open("./models/log/psnr_Score.txt", "a+")
         f.write("Final PSNR Avg: %f" % (psnrAvg / len(testLoader)))
         print("Final PSNR Avg: %f" % (psnrAvg / len(testLoader)))
 
