@@ -114,37 +114,61 @@ def data_loader():
 #     return gradient_penalty
 
 
+# def computeGradientPenaltyFor1WayGAN(discriminator, realSample, fakeSample):
+#     alpha = Tensor_gpu(np.random.random((realSample.shape)))
+#     interpolates = (alpha * realSample + (1 - alpha) * fakeSample).requires_grad_(True)
+#     dInterpolation = discriminator(interpolates)
+#     fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
+#
+#     gradients = autograd.grad(
+#         outputs=dInterpolation,
+#         inputs=interpolates,
+#         grad_outputs=fakeOutput,
+#         create_graph=True,
+#         retain_graph=True,
+#         only_inputs=True)[0]
+#
+#     ## Use Adadpative weighting scheme
+#     gradients = gradients.view(gradients.size(0), -1)
+#     maxVals = []
+#     normGradients = gradients.norm(2, dim=1) - 1
+#     for i in range(len(normGradients)):
+#         if (normGradients[i] > 0):
+#             maxVals.append(Variable(normGradients[i].type(Tensor)).detach().numpy())
+#         else:
+#             maxVals.append(0)
+#
+#     gradientPenalty = np.mean(maxVals)
+#     return gradientPenalty
+
 def computeGradientPenaltyFor1WayGAN(discriminator, realSample, fakeSample):
     alpha = Tensor_gpu(np.random.random((realSample.shape)))
-    interpolates = (alpha * realSample + ((1 - alpha) * fakeSample)).requires_grad_(True)
+    interpolates = (alpha * realSample + (1 - alpha) * fakeSample).requires_grad_(True)
     dInterpolation = discriminator(interpolates)
-    fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
+    # fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
 
     gradients = autograd.grad(
         outputs=dInterpolation,
         inputs=interpolates,
-        grad_outputs=fakeOutput,
+        grad_outputs=torch.ones(dInterpolation.size()).cuda(),
         create_graph=True,
         retain_graph=True,
         only_inputs=True)[0]
 
     ## Use Adadpative weighting scheme
     gradients = gradients.view(gradients.size(0), -1)
-    maxVals = []
     normGradients = gradients.norm(2, dim=1) - 1
     for i in range(len(normGradients)):
-        if (normGradients[i] > 0):
-            maxVals.append(Variable(normGradients[i].type(Tensor)).detach().numpy())
-        else:
-            maxVals.append(0)
+        if (normGradients[i] < 0):
+            normGradients[i] = 0
 
-    gradientPenalty = np.mean(maxVals)
+    gradientPenalty = torch.mean(normGradients)
     return gradientPenalty
 
 
 def compute_gradient_penalty(discriminator, real_sample, fake_sample):
     """
-    This function used to compute Gradient Penalty
+    This function used to compute Gradient Penalty (WGAN_GP)
     The equation is Equation(4) in Chp5
     :param discriminator: stands for D_Y
     :param real_sample: stands for Y
