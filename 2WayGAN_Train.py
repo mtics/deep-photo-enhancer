@@ -88,12 +88,6 @@ if __name__ == "__main__":
             x2 = generator_yx(y1)  # X''
             y2 = generator_xy(x1)  # Y''
 
-            i_loss = computeIdentityMappingLoss(x, x1, y, y1)
-            c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
-            g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
-
-            g_loss.backward(retain_graph=True)
-
             optimizer_g_xy.step()
             optimizer_g_yx.step()
 
@@ -115,9 +109,12 @@ if __name__ == "__main__":
                                computeGradientPenaltyFor1WayGAN(discriminator_y, x.data, x1.data)
             # gradient_penalty.backward(retain_graph=True)
             d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
+
+            i_loss = computeIdentityMappingLoss(x, x1, y, y1)
+            c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
+            g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
+            g_loss.backward(retain_graph=True)
             d_loss.backward(retain_graph=True)
-            ad.backward(retain_graph=True)
-            ag.backward(retain_graph=True)
 
             optimizer_d_xy.step()
             optimizer_d_yx.step()
