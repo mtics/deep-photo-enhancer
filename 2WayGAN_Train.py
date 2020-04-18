@@ -20,9 +20,6 @@ if __name__ == "__main__":
     generator_yx = nn.DataParallel(generator_yx)
     generator_yx.load_state_dict(torch.load('./gan2_pretrain_50_113_yx.pth'))
 
-    generator_xy.train()
-    generator_yx.train()
-
     discriminator_x = Discriminator()
     discriminator_x = nn.DataParallel(discriminator_x)
 
@@ -44,8 +41,8 @@ if __name__ == "__main__":
     optimizer_g_xy = optim.Adam(generator_xy.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
     optimizer_g_yx = optim.Adam(generator_yx.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
 
-    optimizer_d_xy = optim.Adam(discriminator_x.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
-    optimizer_d_yx = optim.Adam(discriminator_y.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
+    optimizer_dx = optim.Adam(discriminator_x.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
+    optimizer_dy = optim.Adam(discriminator_y.parameters(), lr=LEARNING_RATE, betas=(BETA1, BETA2))
 
     # Training Network
     dataiter = iter(testLoader)
@@ -79,8 +76,11 @@ if __name__ == "__main__":
             #     optimizer_g_yx.step()
 
             # TRAIN GENERATOR
-            generator_xy.zero_grad()
-            generator_yx.zero_grad()
+            generator_xy.train()
+            generator_yx.train()
+
+            optimizer_g_xy.zero_grad()
+            optimizer_g_yx.zero_grad()
 
             y1 = generator_xy(x)  # Y'
             x1 = generator_yx(y)  # X'
@@ -92,16 +92,16 @@ if __name__ == "__main__":
             optimizer_g_yx.step()
 
             # TRAIN DISCRIMINATOR
-            discriminator_x.zero_grad()
-            discriminator_y.zero_grad()
+            optimizer_dx.zero_grad()
+            optimizer_dy.zero_grad()
 
             # Real Images
-            dy = discriminator_x(y)  # D_Y
+            dy = discriminator_y(y)  # D_Y
             # Fake Images
-            dy1 = discriminator_x(y1)  # D_Y'
+            dy1 = discriminator_y(y1)  # D_Y'
 
-            dx = discriminator_y(x)  # D_X
-            dx1 = discriminator_y(x1)  # D_X'
+            dx = discriminator_x(x)  # D_X
+            dx1 = discriminator_x(x1)  # D_X'
 
             ad, ag = computeAdversarialLosses(dx, dx1, dy, dy1)
             # ad.backward(retain_graph=True)
@@ -116,8 +116,8 @@ if __name__ == "__main__":
             g_loss.backward(retain_graph=True)
             d_loss.backward(retain_graph=True)
 
-            optimizer_d_xy.step()
-            optimizer_d_yx.step()
+            optimizer_dx.step()
+            optimizer_dy.step()
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(), c_loss.item()))
