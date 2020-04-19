@@ -54,7 +54,23 @@ if __name__ == "__main__":
     generator_yx_loss = []
     discriminator_x_loss = []
     discriminator_y_loss = []
+    learning_rate = LEARNING_RATE
     for epoch in range(NUM_EPOCHS_TRAIN):
+
+        # adaptive adjust learning rate
+        for param_group in optimizer_g_xy.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
+        for param_group in optimizer_g_yx.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
+        for param_group in optimizer_dx.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
+        for param_group in optimizer_dy.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
+
         for i, (data, gt1) in enumerate(trainLoader_cross, 0):
             input, dummy = data
             groundTruth, dummy = gt1

@@ -35,7 +35,15 @@ if __name__ == "__main__":
     batches_done = 0
     running_loss = 0.0
     running_losslist = []
+    learning_rate = LEARNING_RATE
     for epoch in range(NUM_EPOCHS_PRETRAIN):
+
+        for param_group in optimizer_g_xy.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
+        for param_group in optimizer_g_yx.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
         for i, (target, input) in enumerate(trainLoader1, 0):
             unenhanced_image = input[0]
             enhanced_image = target[0]
