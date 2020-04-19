@@ -9,6 +9,8 @@ if __name__ == "__main__":
 
     start_time = datetime.now()
 
+    learning_rate = LEARNING_RATE
+
     # Creating generator and discriminator
     generator = Generator()
 
@@ -31,6 +33,10 @@ if __name__ == "__main__":
     running_loss = 0.0
     running_losslist = []
     for epoch in range(NUM_EPOCHS_PRETRAIN):
+
+        for param_group in optimizer_g.param_groups:
+                    param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
         for i, (target, input) in enumerate(trainLoader1, 0):
             unenhanced_image = input[0]
             enhanced_image = target[0]

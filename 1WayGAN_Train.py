@@ -46,6 +46,9 @@ if __name__ == "__main__":
         for param_group in optimizer_d.param_groups:
             param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
 
+        for param_group in optimizer_g.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
         for i, (data, gt1) in enumerate(trainLoader_cross, 0):
             input, dummy = data
             groundTruth, dummy = gt1
@@ -66,15 +69,12 @@ if __name__ == "__main__":
             dLoss.backward(retain_graph=True)
             optimizer_d.step()
 
-            if batches_done % 50 == 0:
-                for param_group in optimizer_g.param_groups:
-                    param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
 
-                # TRAIN GENERATOR
-                optimizer_g.zero_grad()
-                gLoss = computeGeneratorLoss(trainInput, fake_imgs, discriminator, criterion)
-                gLoss.backward(retain_graph=True)
-                optimizer_g.step()
+            # TRAIN GENERATOR
+            optimizer_g.zero_grad()
+            gLoss = computeGeneratorLoss(trainInput, fake_imgs, discriminator, criterion)
+            gLoss.backward(retain_graph=True)
+            optimizer_g.step()
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), dLoss.item(), gLoss.item()))
