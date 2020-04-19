@@ -88,7 +88,7 @@ if __name__ == "__main__":
             x2 = generator_yx(y1)  # X''
             y2 = generator_xy(x1)  # Y''
 
-            ag = criterion(discriminator_x(x1))+criterion(discriminator_y(y1))
+            ag = torch.mean(discriminator_x(x1))+torch.mean(discriminator_y(y1))
 
             i_loss = computeIdentityMappingLoss(x, x1, y, y1)
             c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
