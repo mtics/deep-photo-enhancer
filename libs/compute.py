@@ -235,8 +235,8 @@ def computeDiscriminatorLoss(d1Real, d1Fake, gradPenalty):
 def computeGeneratorLoss(inputs, outputs_g1, discriminator, criterion):
     """
     This function is used to compute Generator Loss
-    :param inputs:
-    :param outputs_g1:
+    :param inputs: X
+    :param outputs_g1: Y'
     :param discriminator:
     :param criterion:
     :return:

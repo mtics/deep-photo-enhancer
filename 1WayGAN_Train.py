@@ -55,9 +55,16 @@ if __name__ == "__main__":
             trainInput = Variable(input.type(Tensor_gpu))           # X
             real_imgs = Variable(groundTruth.type(Tensor_gpu))      # Y
 
+            # TRAIN GENERATOR
+            optimizer_g.zero_grad()
+            fake_imgs = generator(trainInput)                       # Y'
+
+            gLoss = computeGeneratorLoss(trainInput, fake_imgs, discriminator, criterion)
+            gLoss.backward(retain_graph=True)
+            optimizer_g.step()
+
             # TRAIN DISCRIMINATOR
             optimizer_d.zero_grad()
-            fake_imgs = generator(trainInput)                       # Y'
 
             # Real Images
             realValid = discriminator(real_imgs)                    # D_Y
@@ -68,13 +75,6 @@ if __name__ == "__main__":
             dLoss = computeDiscriminatorLoss(realValid, fakeValid, gradientPenalty)
             dLoss.backward(retain_graph=True)
             optimizer_d.step()
-
-
-            # TRAIN GENERATOR
-            optimizer_g.zero_grad()
-            gLoss = computeGeneratorLoss(trainInput, fake_imgs, discriminator, criterion)
-            gLoss.backward(retain_graph=True)
-            optimizer_g.step()
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), dLoss.item(), gLoss.item()))

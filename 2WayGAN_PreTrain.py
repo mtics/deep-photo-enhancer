@@ -43,30 +43,26 @@ if __name__ == "__main__":
             y = Variable(enhanced_image.type(Tensor_gpu))  # Y
 
             optimizer_g_xy.zero_grad()
-            optimizer_g_yx.zero_grad()
-
             y1 = generator_xy(x)  # X->Y'
-            x1 = generator_yx(y)  # Y->X'
-
-            x2 = generator_yx(y1)  # X''
-            y2 = generator_xy(x1)  # Y''
-
-            i_loss = computeIdentityMappingLoss(x, x1, y, y1)
-            c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
-            g_loss = ALPHA * i_loss + 10 * ALPHA * c_loss
-            g_loss.backward()
-
+            g1_loss = criterion(x, y1)
+            g1_loss.backward(retain_graph=True)
             optimizer_g_xy.step()
+
+            optimizer_g_yx.zero_grad()
+            x1 = generator_yx(y)  # Y->X'
+            g2_loss = criterion(y, x1)
+            g2_loss.backward(retain_graph=True)
             optimizer_g_yx.step()
 
             # Print statistics
+            g_loss = (g1_loss + g2_loss) / 2
             running_losslist.append(g_loss.item())
 
             f = open("./models/log/log_PreTraining.txt", "a+")
-            f.write("[Epoch %d/%d] [Batch %d/%d] [G loss: %f] [I loss: %f] [C loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g_loss.item(), i_loss.item(), c_loss.item()))
-            print("[Epoch %d/%d] [Batch %d/%d] [G loss: %f] [I loss: %f] [C loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g_loss.item(), i_loss.item(), c_loss.item()))
+            f.write("[Epoch %d/%d] [Batch %d/%d] [G1 loss: %f] [G2 loss: %f]\n" % (
+                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g1_loss.item(), g2_loss.item()))
+            print("[Epoch %d/%d] [Batch %d/%d] [G1 loss: %f] [G2 loss: %f]\n" % (
+                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g1_loss.item(), g2_loss.item()))
             f.close()
 
             # if i % 200 == 200:    # print every 200 mini-batches
