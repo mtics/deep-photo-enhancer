@@ -12,6 +12,8 @@ def data_visualization(file_path, save_path):
     ads = list()
     ags = list()
     gps = list()
+    g1_losses = list()
+    g2_losses = list()
 
     with open(file_path) as file:
         for line in file:
@@ -42,6 +44,14 @@ def data_visualization(file_path, save_path):
                         ags.append(value)
                     elif name == "GP":
                         gps.append(value)
+                    elif name == "G1 loss":
+                        if value > 0.001:
+                            value = 0.001
+                        g1_losses.append(value)
+                    elif name == "G2 loss":
+                        if value > 0.001:
+                            value = 0.001
+                        g2_losses.append(value)
 
     x_list = list()
     for i in range(0, 200*113):
@@ -81,6 +91,16 @@ def data_visualization(file_path, save_path):
     line.add_xaxis(x_list)
     line.add_yaxis("GP", gps)
     line.render(save_path+"data_GP.html")
+
+    line = Line()
+    line.add_xaxis(x_list)
+    line.add_yaxis("G1", g1_losses)
+    line.render(save_path+"data_G1.html")
+
+    line = Line()
+    line.add_xaxis(x_list)
+    line.add_yaxis("G2", g2_losses)
+    line.render(save_path+"data_G2.html")
 
 
 

@@ -17,21 +17,21 @@ def data_loader():
     print("Loading Dataset")
     transform = transforms.Compose([transforms.Resize((SIZE, SIZE), interpolation=2), transforms.ToTensor()])
 
-    testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Testing/', transform=transform)
-    trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training1/', transform=transform)
-    trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training2/', transform=transform)
-    
-    testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Testing/', transform=transform)
-    trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training1/', transform=transform)
-    trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training2/', transform=transform)
+    # testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Testing/', transform=transform)
+    # trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training1/', transform=transform)
+    # trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training2/', transform=transform)
+    #
+    # testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Testing/', transform=transform)
+    # trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training1/', transform=transform)
+    # trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training2/', transform=transform)
 
-    # testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Testing/', transform=transform)
-    # trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Training1/', transform=transform)
-    # trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Training2/', transform=transform)
+    testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Testing/', transform=transform)
+    trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Training1/', transform=transform)
+    trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Training2/', transform=transform)
 
-    # testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Testing/', transform=transform)
-    # trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Training1/', transform=transform)
-    # trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Training2/', transform=transform)
+    testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Testing/', transform=transform)
+    trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Training1/', transform=transform)
+    trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Training2/', transform=transform)
 
     train_loader_1 = torch.utils.data.DataLoader(
         ConcatDataset(
