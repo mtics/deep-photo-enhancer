@@ -18,18 +18,18 @@ if __name__ == "__main__":
 
     # Creating generator and discriminator
     generator_xy = Generator()
-    # generator_xy = nn.DataParallel(generator_xy)
+    generator_xy = nn.DataParallel(generator_xy)
     generator_xy.load_state_dict(torch.load('./gan2_pretrain_50_113_xy.pth'))
 
     generator_yx = Generator()
-    # generator_yx = nn.DataParallel(generator_yx)
+    generator_yx = nn.DataParallel(generator_yx)
     generator_yx.load_state_dict(torch.load('./gan2_pretrain_50_113_yx.pth'))
 
     discriminator_x = Discriminator()
-    # discriminator_x = nn.DataParallel(discriminator_x)
+    discriminator_x = nn.DataParallel(discriminator_x)
 
     discriminator_y = Discriminator()
-    # discriminator_y = nn.DataParallel(discriminator_y)
+    discriminator_y = nn.DataParallel(discriminator_y)
 
     if torch.cuda.is_available():
         generator_xy.cuda(device=device)
