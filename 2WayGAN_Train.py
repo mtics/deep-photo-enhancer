@@ -96,7 +96,7 @@ if __name__ == "__main__":
             #     optimizer_g_yx.step()
 
             # TRAIN GENERATOR
-            if i % 50 == 0:
+            if batches_done % 50 == 0:
                 generator_xy.train()
                 generator_yx.train()
 
@@ -187,6 +187,8 @@ if __name__ == "__main__":
                        "./models/train_test_images/2Way/2Way_Train_Test_%d_%d.png" % (
                            epoch, k),
                        nrow=1, normalize=True)
+
+        batches_done = i
 
     # TEST NETWORK
     batches_done = 0
