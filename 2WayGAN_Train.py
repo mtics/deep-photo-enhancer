@@ -12,9 +12,9 @@ if __name__ == "__main__":
     start_time = datetime.now()
 
     # delete old logs and create new logs
-    if os.path.exists('./models/log/log_Train.txt'):
-        os.remove('./models/log/log_Train.txt')
-        os.mknod('./models/log/log_Train.txt')
+    # if os.path.exists('./models/log/log_Train.txt'):
+    #     os.remove('./models/log/log_Train.txt')
+    #     os.mknod('./models/log/log_Train.txt')
 
     # Creating generator and discriminator
     generator_xy = Generator()
@@ -27,11 +27,11 @@ if __name__ == "__main__":
 
     discriminator_x = Discriminator()
     discriminator_x = nn.DataParallel(discriminator_x)
-    discriminator_x.load_state_dict('./discriminator2_train_149_xy.pth')
+    discriminator_x.load_state_dict(torch.load('./discriminator2_train_149_xy.pth'))
 
     discriminator_y = Discriminator()
     discriminator_y = nn.DataParallel(discriminator_y)
-    discriminator_x.load_state_dict('./discriminator2_train_149_yx.pth')
+    discriminator_y.load_state_dict(torch.load('./discriminator2_train_149_yx.pth'))
 
     if torch.cuda.is_available():
         generator_xy.cuda(device=device)
