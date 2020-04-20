@@ -96,7 +96,7 @@ if __name__ == "__main__":
             #     optimizer_g_yx.step()
 
             # TRAIN GENERATOR
-            if batches_done % 50 == 0:
+            if i % 50 == 0:
                 generator_xy.train()
                 generator_yx.train()
 
