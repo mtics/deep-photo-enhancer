@@ -13,6 +13,7 @@ if __name__ == "__main__":
 
     # delete old logs and create new logs
     if os.path.exists('./models/log/log_Train.txt'):
+        os.remove('./models/log/log_Train.txt')
         os.mknod('./models/log/log_Train.txt')
 
     # Creating generator and discriminator

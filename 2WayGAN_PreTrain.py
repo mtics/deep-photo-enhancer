@@ -13,8 +13,10 @@ if __name__ == "__main__":
 
     # delete old logs and create new logs
     if os.path.exists('./models/log/log_PreTraining.txt'):
+        os.remove('./models/log/log_PreTraining.txt')
         os.mknod('./models/log/log_PreTraining.txt')
     if os.path.exists('./models/log/log_PreTraining_LossList.txt'):
+        os.remove('./models/log/log_PreTraining_LossList.txt')
         os.mknod('./models/log/log_PreTraining_LossList.txt')
 
     # Creating generator and discriminator
