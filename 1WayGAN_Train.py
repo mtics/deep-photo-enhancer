@@ -379,7 +379,7 @@ for epoch in range(NUM_EPOCHS_TRAIN):
 
         gradientPenalty = computeGradientPenalty(discriminator, realImgs.data, fake_imgs.data)
         dLoss = discriminatorLoss(realValid, fakeValid, gradientPenalty)
-        dLoss.backward()
+        dLoss.backward(retian_graph=true)
         optimizer_d.step()
 
         if batches_done % 50 == 0:
