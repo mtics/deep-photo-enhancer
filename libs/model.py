@@ -5,7 +5,7 @@ device = torch.device('cuda', 0)  # Default CUDA device
 device_ids = [0, 1, 2, 3]  # CUDA ids
 Tensor_gpu = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
 Tensor = torch.FloatTensor
-GPUS_NUM = torch.cuda.device_count()  # the GPUs' number
+GPUS_NUM = 1  # the GPUs' number
 
 
 # GENERATOR NETWORK
