@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # delete old logs and create new logs
     if os.path.exists('./models/log/log_Train.txt'):
         os.mknod('./models/log/log_Train.txt')
-        
+
     # Creating generator and discriminator
     generator_xy = Generator()
     generator_xy = nn.DataParallel(generator_xy)
@@ -95,27 +95,28 @@ if __name__ == "__main__":
             #     optimizer_g_yx.step()
 
             # TRAIN GENERATOR
-            generator_xy.train()
-            generator_yx.train()
+            if batches_done % 50 == 0:
+                generator_xy.train()
+                generator_yx.train()
 
-            optimizer_g_xy.zero_grad()
-            optimizer_g_yx.zero_grad()
+                optimizer_g_xy.zero_grad()
+                optimizer_g_yx.zero_grad()
 
-            y1 = generator_xy(x)  # Y'
-            x1 = generator_yx(y)  # X'
+                y1 = generator_xy(x)  # Y'
+                x1 = generator_yx(y)  # X'
 
-            x2 = generator_yx(y1)  # X''
-            y2 = generator_xy(x1)  # Y''
+                x2 = generator_yx(y1)  # X''
+                y2 = generator_xy(x1)  # Y''
 
-            ag = torch.mean(discriminator_x(x1)) + torch.mean(discriminator_y(y1))
+                ag = torch.mean(discriminator_x(x1)) + torch.mean(discriminator_y(y1))
 
-            i_loss = computeIdentityMappingLoss(x, x1, y, y1)
-            c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
-            g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
-            g_loss.backward(retain_graph=True)
+                i_loss = computeIdentityMappingLoss(x, x1, y, y1)
+                c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
+                g_loss = computeGeneratorLossFor2WayGan(ag, i_loss, c_loss)
+                g_loss.backward(retain_graph=True)
 
-            optimizer_g_xy.step()
-            optimizer_g_yx.step()
+                optimizer_g_xy.step()
+                optimizer_g_yx.step()
 
             # TRAIN DISCRIMINATOR
             optimizer_dx.zero_grad()
