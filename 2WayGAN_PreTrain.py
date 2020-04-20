@@ -5,10 +5,17 @@ from libs.compute import *
 from libs.constant import *
 # from libs.old_model import *
 from libs.model import *
+import os
 
 if __name__ == "__main__":
 
     start_time = datetime.now()
+
+    # delete old logs and create new logs
+    if os.path.exists('./models/log/log_PreTraining.txt'):
+        os.mknod('./models/log/log_PreTraining.txt')
+    if os.path.exists('./models/log/log_PreTraining_LossList.txt'):
+        os.mknod('./models/log/log_PreTraining_LossList.txt')
 
     # Creating generator and discriminator
     generator_xy = Generator()
@@ -82,7 +89,7 @@ if __name__ == "__main__":
                            normalize=True)
                 torch.save(generator_xy.state_dict(),
                            './models/pretrain_checkpoint/xy/gan2_pretrain_' + str(epoch + 1) + '_' + str(
-                               i + 1) + '.pth')
+                               i + 1) + '_xy.pth')
 
                 save_image(x1.data,
                            "./models/pretrain_images/yx/gan2_pretrain_%d_%d.png" % (epoch + 1, i + 1),
@@ -90,7 +97,7 @@ if __name__ == "__main__":
                            normalize=True)
                 torch.save(generator_yx.state_dict(),
                            './models/pretrain_checkpoint/yx/gan2_pretrain_' + str(epoch + 1) + '_' + str(
-                               i + 1) + '.pth')
+                               i + 1) + '_yx.pth')
 
     end_time = datetime.now()
     print(end_time - start_time)

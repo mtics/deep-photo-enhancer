@@ -5,12 +5,16 @@ from libs.compute import *
 from libs.constant import *
 from libs.model import *
 # from libs.old_model import *
-
+import os
 
 if __name__ == "__main__":
 
     start_time = datetime.now()
 
+    # delete old logs and create new logs
+    if os.path.exists('./models/log/log_Train.txt'):
+        os.mknod('./models/log/log_Train.txt')
+        
     # Creating generator and discriminator
     generator_xy = Generator()
     generator_xy = nn.DataParallel(generator_xy)
@@ -70,7 +74,6 @@ if __name__ == "__main__":
         for param_group in optimizer_dy.param_groups:
             param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
 
-
         for i, (data, gt1) in enumerate(trainLoader_cross, 0):
             input, dummy = data
             groundTruth, dummy = gt1
@@ -91,7 +94,7 @@ if __name__ == "__main__":
             #     optimizer_g_xy.step()
             #     optimizer_g_yx.step()
 
-             # TRAIN GENERATOR
+            # TRAIN GENERATOR
             generator_xy.train()
             generator_yx.train()
 
@@ -104,7 +107,7 @@ if __name__ == "__main__":
             x2 = generator_yx(y1)  # X''
             y2 = generator_xy(x1)  # Y''
 
-            ag = torch.mean(discriminator_x(x1))+torch.mean(discriminator_y(y1))
+            ag = torch.mean(discriminator_x(x1)) + torch.mean(discriminator_y(y1))
 
             i_loss = computeIdentityMappingLoss(x, x1, y, y1)
             c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
@@ -113,7 +116,6 @@ if __name__ == "__main__":
 
             optimizer_g_xy.step()
             optimizer_g_yx.step()
-
 
             # TRAIN DISCRIMINATOR
             optimizer_dx.zero_grad()
@@ -139,22 +141,24 @@ if __name__ == "__main__":
             optimizer_dy.step()
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f]" % (
-                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(), c_loss.item()))
+                epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), d_loss.item(), g_loss.item(), i_loss.item(),
+                c_loss.item()))
 
             f = open("./models/log/log_Train.txt", "a+")
-            f.write("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f] [AD: %f] [AG: %f] [GP: %f]\n" % (
-                epoch + 1,
-                NUM_EPOCHS_TRAIN,
-                i + 1,
-                len(trainLoader_cross),
-                d_loss.item(),
-                g_loss.item(),
-                i_loss.item(),
-                c_loss.item(),
-                ad.item(),
-                ag.item(),
-                gradient_penalty.item()
-            ))
+            f.write(
+                "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f] [I loss: %f] [C loss: %f] [AD: %f] [AG: %f] [GP: %f]\n" % (
+                    epoch + 1,
+                    NUM_EPOCHS_TRAIN,
+                    i + 1,
+                    len(trainLoader_cross),
+                    d_loss.item(),
+                    g_loss.item(),
+                    i_loss.item(),
+                    c_loss.item(),
+                    ad.item(),
+                    ag.item(),
+                    gradient_penalty.item()
+                ))
             f.close()
 
             print("Done training discriminator on iteration: %d" % i)
@@ -179,7 +183,7 @@ if __name__ == "__main__":
         for k in range(0, fake_test_imgs.data.shape[0]):
             save_image(fake_test_imgs.data[k],
                        "./models/train_test_images/2Way/2Way_Train_Test_%d_%d.png" % (
-                       epoch, k),
+                           epoch, k),
                        nrow=1, normalize=True)
 
     # TEST NETWORK
