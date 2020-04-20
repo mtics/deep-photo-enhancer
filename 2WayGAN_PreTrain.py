@@ -23,8 +23,8 @@ if __name__ == "__main__":
     generator_xy = Generator()
     generator_yx = Generator()
 
-    generator_xy = nn.DataParallel(generator_xy)
-    generator_yx = nn.DataParallel(generator_yx)
+    # generator_xy = nn.DataParallel(generator_xy)
+    # generator_yx = nn.DataParallel(generator_yx)
 
     if torch.cuda.is_available():
         generator_xy.cuda(device=device)
