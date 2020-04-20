@@ -54,7 +54,7 @@ def data_visualization(file_path, save_path):
                         g2_losses.append(value)
 
     x_list = list()
-    for i in range(0, 100*12):
+    for i in range(0, 150*113):
         x_list.append(i)
 
     line = Line()
