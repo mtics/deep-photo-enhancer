@@ -188,7 +188,7 @@ if __name__ == "__main__":
                            epoch, k),
                        nrow=1, normalize=True)
 
-        batches_done = i
+        batches_done += 1
 
     # TEST NETWORK
     batches_done = 0
