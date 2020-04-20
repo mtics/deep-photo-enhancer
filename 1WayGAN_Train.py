@@ -227,7 +227,7 @@ class Discriminator(nn.Module):
 
 # Creating generator and discriminator
 generator1 = Generator()
-generator1.load_state_dict(torch.load('./gan1_pretrain_49_449.pth'))
+generator1.load_state_dict(torch.load('./gan1_pretrain_50_12.pth'))
 generator1.train()
 
 discriminator = Discriminator()
