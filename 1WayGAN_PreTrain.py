@@ -378,7 +378,7 @@ for epoch in range(NUM_EPOCHS_PRETRAIN):
         print("[Epoch %d/%d] [Batch %d/%d] [G loss: %f]\n" % (
         epoch, NUM_EPOCHS_PRETRAIN, i, len(trainLoader1), loss.item()))
         f.close()
-        if i % 200 == 200:  # print every 200 mini-batches
+        if i % 4 == 0:  # print every 200 mini-batches
             print('[%d, %5d] loss: %.5f' % (epoch + 1, i + 1, running_loss / 200))
             running_loss = 0.0
             save_image(generated_enhanced_image.data[:25],
