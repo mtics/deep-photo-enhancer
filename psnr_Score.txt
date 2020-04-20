@@ -1,1 +1,0 @@
-Final PSNR Avg: 9.786848
