@@ -375,6 +375,8 @@ for epoch in range(NUM_EPOCHS_PRETRAIN):
         f = open("./models/log_PreTraining.txt", "a+")
         f.write("[Epoch %d/%d] [Batch %d/%d] [G loss: %f]\n" % (
         epoch, NUM_EPOCHS_PRETRAIN, i, len(trainLoader1), loss.item()))
+        print("[Epoch %d/%d] [Batch %d/%d] [G loss: %f]\n" % (
+        epoch, NUM_EPOCHS_PRETRAIN, i, len(trainLoader1), loss.item()))
         f.close()
         if i % 200 == 200:  # print every 200 mini-batches
             print('[%d, %5d] loss: %.5f' % (epoch + 1, i + 1, running_loss / 200))
