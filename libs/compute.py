@@ -17,21 +17,21 @@ def data_loader():
     print("Loading Dataset")
     transform = transforms.Compose([transforms.Resize((SIZE, SIZE), interpolation=2), transforms.ToTensor()])
 
-    testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Testing/', transform=transform)
-    trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training1/', transform=transform)
-    trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training2/', transform=transform)
-    
-    testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Testing/', transform=transform)
-    trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training1/', transform=transform)
-    trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training2/', transform=transform)
+    # testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Testing/', transform=transform)
+    # trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training1/', transform=transform)
+    # trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training2/', transform=transform)
+    #
+    # testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Testing/', transform=transform)
+    # trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training1/', transform=transform)
+    # trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/input/Training2/', transform=transform)
 
-    # testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Testing/', transform=transform)
-    # trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Training1/', transform=transform)
-    # trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Training2/', transform=transform)
+    testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Testing/', transform=transform)
+    trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Training1/', transform=transform)
+    trainset_2_gt = torchvision.datasets.ImageFolder(root='./images_LR/mini/Expert-C/Training2/', transform=transform)
 
-    # testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Testing/', transform=transform)
-    # trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Training1/', transform=transform)
-    # trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Training2/', transform=transform)
+    testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Testing/', transform=transform)
+    trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Training1/', transform=transform)
+    trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/mini/input/Training2/', transform=transform)
 
     train_loader_1 = torch.utils.data.DataLoader(
         ConcatDataset(
@@ -114,37 +114,61 @@ def data_loader():
 #     return gradient_penalty
 
 
+# def computeGradientPenaltyFor1WayGAN(discriminator, realSample, fakeSample):
+#     alpha = Tensor_gpu(np.random.random((realSample.shape)))
+#     interpolates = (alpha * realSample + (1 - alpha) * fakeSample).requires_grad_(True)
+#     dInterpolation = discriminator(interpolates)
+#     fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
+#
+#     gradients = autograd.grad(
+#         outputs=dInterpolation,
+#         inputs=interpolates,
+#         grad_outputs=fakeOutput,
+#         create_graph=True,
+#         retain_graph=True,
+#         only_inputs=True)[0]
+#
+#     ## Use Adadpative weighting scheme
+#     gradients = gradients.view(gradients.size(0), -1)
+#     maxVals = []
+#     normGradients = gradients.norm(2, dim=1) - 1
+#     for i in range(len(normGradients)):
+#         if (normGradients[i] > 0):
+#             maxVals.append(Variable(normGradients[i].type(Tensor)).detach().numpy())
+#         else:
+#             maxVals.append(0)
+#
+#     gradientPenalty = np.mean(maxVals)
+#     return gradientPenalty
+
 def computeGradientPenaltyFor1WayGAN(discriminator, realSample, fakeSample):
     alpha = Tensor_gpu(np.random.random((realSample.shape)))
-    interpolates = (alpha * realSample + ((1 - alpha) * fakeSample)).requires_grad_(True)
+    interpolates = (alpha * realSample + (1 - alpha) * fakeSample).requires_grad_(True)
     dInterpolation = discriminator(interpolates)
-    fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
+    # fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
 
     gradients = autograd.grad(
         outputs=dInterpolation,
         inputs=interpolates,
-        grad_outputs=fakeOutput,
+        grad_outputs=torch.ones(dInterpolation.size()).cuda(),
         create_graph=True,
         retain_graph=True,
         only_inputs=True)[0]
 
     ## Use Adadpative weighting scheme
     gradients = gradients.view(gradients.size(0), -1)
-    maxVals = []
     normGradients = gradients.norm(2, dim=1) - 1
     for i in range(len(normGradients)):
-        if (normGradients[i] > 0):
-            maxVals.append(Variable(normGradients[i].type(Tensor)).detach().numpy())
-        else:
-            maxVals.append(0)
+        if normGradients[i] < 0:
+            normGradients[i] = 0
 
-    gradientPenalty = np.mean(maxVals)
+    gradientPenalty = normGradients.mean()
     return gradientPenalty
 
 
 def compute_gradient_penalty(discriminator, real_sample, fake_sample):
     """
-    This function used to compute Gradient Penalty
+    This function used to compute Gradient Penalty (WGAN_GP)
     The equation is Equation(4) in Chp5
     :param discriminator: stands for D_Y
     :param real_sample: stands for Y
@@ -211,8 +235,8 @@ def computeDiscriminatorLoss(d1Real, d1Fake, gradPenalty):
 def computeGeneratorLoss(inputs, outputs_g1, discriminator, criterion):
     """
     This function is used to compute Generator Loss
-    :param inputs:
-    :param outputs_g1:
+    :param inputs: X
+    :param outputs_g1: Y'
     :param discriminator:
     :param criterion:
     :return:

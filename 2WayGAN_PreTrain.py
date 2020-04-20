@@ -5,10 +5,19 @@ from libs.compute import *
 from libs.constant import *
 # from libs.old_model import *
 from libs.model import *
+import os
 
 if __name__ == "__main__":
 
     start_time = datetime.now()
+
+    # delete old logs and create new logs
+    if os.path.exists('./models/log/log_PreTraining.txt'):
+        os.remove('./models/log/log_PreTraining.txt')
+        os.mknod('./models/log/log_PreTraining.txt')
+    if os.path.exists('./models/log/log_PreTraining_LossList.txt'):
+        os.remove('./models/log/log_PreTraining_LossList.txt')
+        os.mknod('./models/log/log_PreTraining_LossList.txt')
 
     # Creating generator and discriminator
     generator_xy = Generator()
@@ -35,7 +44,15 @@ if __name__ == "__main__":
     batches_done = 0
     running_loss = 0.0
     running_losslist = []
+    learning_rate = LEARNING_RATE
     for epoch in range(NUM_EPOCHS_PRETRAIN):
+
+        for param_group in optimizer_g_xy.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
+        for param_group in optimizer_g_yx.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
         for i, (target, input) in enumerate(trainLoader1, 0):
             unenhanced_image = input[0]
             enhanced_image = target[0]
@@ -43,30 +60,26 @@ if __name__ == "__main__":
             y = Variable(enhanced_image.type(Tensor_gpu))  # Y
 
             optimizer_g_xy.zero_grad()
-            optimizer_g_yx.zero_grad()
-
             y1 = generator_xy(x)  # X->Y'
-            x1 = generator_yx(y)  # Y->X'
-
-            x2 = generator_yx(y1)  # X''
-            y2 = generator_xy(x1)  # Y''
-
-            i_loss = computeIdentityMappingLoss(x, x1, y, y1)
-            c_loss = computeCycleConsistencyLoss(x, x2, y, y2)
-            g_loss = ALPHA * i_loss + 10 * ALPHA * c_loss
-            g_loss.backward()
-
+            g1_loss = criterion(x, y1)
+            g1_loss.backward(retain_graph=True)
             optimizer_g_xy.step()
+
+            optimizer_g_yx.zero_grad()
+            x1 = generator_yx(y)  # Y->X'
+            g2_loss = criterion(y, x1)
+            g2_loss.backward(retain_graph=True)
             optimizer_g_yx.step()
 
             # Print statistics
+            g_loss = (g1_loss + g2_loss) / 2
             running_losslist.append(g_loss.item())
 
             f = open("./models/log/log_PreTraining.txt", "a+")
-            f.write("[Epoch %d/%d] [Batch %d/%d] [G loss: %f] [I loss: %f] [C loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g_loss.item(), i_loss.item(), c_loss.item()))
-            print("[Epoch %d/%d] [Batch %d/%d] [G loss: %f] [I loss: %f] [C loss: %f]\n" % (
-                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g_loss.item(), i_loss.item(), c_loss.item()))
+            f.write("[Epoch %d/%d] [Batch %d/%d] [G1 loss: %f] [G2 loss: %f]\n" % (
+                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g1_loss.item(), g2_loss.item()))
+            print("[Epoch %d/%d] [Batch %d/%d] [G1 loss: %f] [G2 loss: %f]\n" % (
+                epoch + 1, NUM_EPOCHS_PRETRAIN + 1, i + 1, len(trainLoader1), g1_loss.item(), g2_loss.item()))
             f.close()
 
             # if i % 200 == 200:    # print every 200 mini-batches
@@ -78,7 +91,7 @@ if __name__ == "__main__":
                            normalize=True)
                 torch.save(generator_xy.state_dict(),
                            './models/pretrain_checkpoint/xy/gan2_pretrain_' + str(epoch + 1) + '_' + str(
-                               i + 1) + '.pth')
+                               i + 1) + '_xy.pth')
 
                 save_image(x1.data,
                            "./models/pretrain_images/yx/gan2_pretrain_%d_%d.png" % (epoch + 1, i + 1),
@@ -86,7 +99,7 @@ if __name__ == "__main__":
                            normalize=True)
                 torch.save(generator_yx.state_dict(),
                            './models/pretrain_checkpoint/yx/gan2_pretrain_' + str(epoch + 1) + '_' + str(
-                               i + 1) + '.pth')
+                               i + 1) + '_yx.pth')
 
     end_time = datetime.now()
     print(end_time - start_time)

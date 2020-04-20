@@ -81,7 +81,7 @@ class Generator(nn.Module):
             nn.ConvTranspose2d(128, 128, 4, stride=2, padding=1)
         )
 
-        # input 64x64x128 ouput 128x128x128
+        # input 64x64x256 ouput 128x128x128
         self.dconv2 = nn.Sequential(
             nn.SELU(inplace=True),
             nn.BatchNorm2d(256),
@@ -142,7 +142,7 @@ class Generator(nn.Module):
 
         # input 8x8x128 to output 1x1x128
         x53 = self.conv53(x52)
-        x53 = self.fc(x53)
+        # x53 = self.fc(x53)
         x53_temp = torch.cat([x53] * 32, dim=2)
         x53_temp = torch.cat([x53_temp] * 32, dim=3)
 
@@ -256,7 +256,7 @@ class Discriminator(nn.Module):
         x = self.conv7(x)
         # print(x.shape)
 
-        # x = self.fc(x)
+        x = self.fc(x)
 
         return x
 

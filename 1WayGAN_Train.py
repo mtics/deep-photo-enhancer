@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # Creating generator and discriminator
     generator = Generator()
     generator = nn.DataParallel(generator)
-    generator.load_state_dict(torch.load('./gan1_pretrain_100_113.pth'))
+    generator.load_state_dict(torch.load('./gan1_pretrain_50_12.pth'))
     generator.train()
 
     discriminator = Discriminator()
@@ -46,35 +46,35 @@ if __name__ == "__main__":
         for param_group in optimizer_d.param_groups:
             param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
 
+        for param_group in optimizer_g.param_groups:
+            param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
+
         for i, (data, gt1) in enumerate(trainLoader_cross, 0):
             input, dummy = data
             groundTruth, dummy = gt1
-            trainInput = Variable(input.type(Tensor_gpu))
-            real_imgs = Variable(groundTruth.type(Tensor_gpu))
+            trainInput = Variable(input.type(Tensor_gpu))           # X
+            real_imgs = Variable(groundTruth.type(Tensor_gpu))      # Y
+
+            # TRAIN GENERATOR
+            optimizer_g.zero_grad()
+            fake_imgs = generator(trainInput)                       # Y'
+
+            gLoss = computeGeneratorLoss(trainInput, fake_imgs, discriminator, criterion)
+            gLoss.backward(retain_graph=True)
+            optimizer_g.step()
 
             # TRAIN DISCRIMINATOR
             optimizer_d.zero_grad()
-            fake_imgs = generator(trainInput)
 
             # Real Images
-            realValid = discriminator(real_imgs)
+            realValid = discriminator(real_imgs)                    # D_Y
             # Fake Images
-            fakeValid = discriminator(fake_imgs)
+            fakeValid = discriminator(fake_imgs)                    # D_Y'
 
             gradientPenalty = computeGradientPenaltyFor1WayGAN(discriminator, real_imgs.data, fake_imgs.data)
             dLoss = computeDiscriminatorLoss(realValid, fakeValid, gradientPenalty)
             dLoss.backward(retain_graph=True)
             optimizer_d.step()
-
-            if batches_done % 50 == 0:
-                for param_group in optimizer_g.param_groups:
-                    param_group['lr'] = adjustLearningRate(learning_rate, epoch_num=epoch, decay_rate=DECAY_RATE)
-
-                # TRAIN GENERATOR
-                optimizer_g.zero_grad()
-                gLoss = computeGeneratorLoss(trainInput, fake_imgs, discriminator, criterion)
-                gLoss.backward(retain_graph=True)
-                optimizer_g.step()
 
             print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]" % (
                 epoch + 1, NUM_EPOCHS_TRAIN, i + 1, len(trainLoader_cross), dLoss.item(), gLoss.item()))
