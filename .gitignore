@@ -1,10 +1,8 @@
 
 ! models/log/*.txt
-! /LPGAN/*.txt
-
+ 
 /images_LR/*
 /.idea/*
 /models/*
 /libs/__pycache__/*
 __pycache__/*
-/LPGAN/
