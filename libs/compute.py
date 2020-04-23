@@ -146,11 +146,12 @@ def computeGradientPenaltyFor1WayGAN(discriminator, realSample, fakeSample):
     interpolates = (alpha * realSample + (1 - alpha) * fakeSample).requires_grad_(True)
     dInterpolation = discriminator(interpolates)
     # fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
+    fakeOutput = Variable(Tensor_gpu(realSample.shape[0], 1).fill_(1.0), requires_grad=False)
 
     gradients = autograd.grad(
         outputs=dInterpolation,
         inputs=interpolates,
-        grad_outputs=torch.ones(dInterpolation.size()).cuda(),
+        grad_outputs=fakeOutput,
         create_graph=True,
         retain_graph=True,
         only_inputs=True)[0]
@@ -178,7 +179,7 @@ def compute_gradient_penalty(discriminator, real_sample, fake_sample):
     alpha = Tensor_gpu(np.random.random(real_sample.shape))
     interpolates = (alpha * real_sample + ((1 - alpha) * fake_sample)).requires_grad_(True)  # stands for y^
     d_interpolation = discriminator(interpolates)  # stands for D_Y(y^)
-    fake_output = Variable(Tensor_gpu(real_sample.shape[0], 1, 1, 1).fill_(1.0), requires_grad=False)
+    fake_output = Variable(Tensor_gpu(real_sample.shape[0], 1).fill_(1.0), requires_grad=False)
 
     gradients = autograd.grad(
         outputs=d_interpolation,
@@ -208,6 +209,36 @@ def compute_gradient_penalty(discriminator, real_sample, fake_sample):
     # gradient_penalty.backward(retain_graph=True)
     return gradient_penalty
 
+def _gradient_penalty(self, data, generated_data, gamma=10):
+    batch_size = data.size(0)
+    epsilon = torch.rand(batch_size, 1, 1, 1)
+    epsilon = epsilon.expand_as(data)
+
+
+    if self.use_cuda:
+        epsilon = epsilon.cuda()
+
+    interpolation = epsilon * data.data + (1 - epsilon) * generated_data.data
+    interpolation = Variable(interpolation, requires_grad=True)
+
+    if self.use_cuda:
+        interpolation = interpolation.cuda()
+
+    interpolation_logits = self.D(interpolation)
+    grad_outputs = torch.ones(interpolation_logits.size())
+
+    if self.use_cuda:
+        grad_outputs = grad_outputs.cuda()
+
+    gradients = autograd.grad(outputs=interpolation_logits,
+                                inputs=interpolation,
+                                grad_outputs=grad_outputs,
+                                create_graph=True,
+                                retain_graph=True)[0]
+
+    gradients = gradients.view(batch_size, -1)
+    gradients_norm = torch.sqrt(torch.sum(gradients ** 2, dim=1) + 1e-12)
+    return self.gamma * ((gradients_norm - 1) ** 2).mean()
 
 def generatorAdversarialLoss(output_images, discriminator):
     """
@@ -300,7 +331,29 @@ def computeAdversarialLosses(dx, dx1, dy, dy1):
 
     return ad, ag
 
+def compute_d_adv_loss(real,fake):
 
+    # dx = discriminatorX(x)
+    # dx1 = discriminatorX(x1)
+    # dy = discriminator(y)
+    # dy1 = discriminator(y1)
+
+    # ad = torch.mean(dx) - torch.mean(dx1) + \
+    #     + torch.mean(dy) - torch.mean(dy1) 
+    ad = torch.mean(real) - torch.mean(fake)
+
+    return ad
+
+def compute_g_adv_loss(discriminator,discriminatorX, x, x1, y, y1):
+
+    dx = discriminatorX(x)
+    dx1 = discriminatorX(x1)
+    dy = discriminator(y)
+    dy1 = discriminator(y1)
+
+    ag = torch.mean(dx1) + torch.mean(dy1)
+
+    return ag
 def computeDiscriminatorLossFor2WayGan(ad, penalty):
     return ad - LAMBDA * penalty
 
@@ -318,3 +371,16 @@ def adjustLearningRate(learning_rate, decay_rate, epoch_num):
     :return:
     """
     return learning_rate / (1 + decay_rate * epoch_num)
+
+def set_requires_grad(nets, requires_grad=False):
+    """Set requies_grad=Fasle for all the networks to avoid unnecessary computations
+    Parameters:
+        nets (network list)   -- a list of networks
+        requires_grad (bool)  -- whether the networks require gradients or not
+    """
+    if not isinstance(nets, list):
+        nets = [nets]
+    for net in nets:
+        if net is not None:
+            for param in net.parameters():
+                param.requires_grad = requires_grad

@@ -5,33 +5,36 @@ from libs.compute import *
 from libs.constant import *
 from libs.model import *
 # from libs.old_model import *
+import itertools
 import os
+
+clip_value = 1e8
 
 if __name__ == "__main__":
 
     start_time = datetime.now()
 
     # delete old logs and create new logs
-    # if os.path.exists('./models/log/log_Train.txt'):
-    #     os.remove('./models/log/log_Train.txt')
-    #     os.mknod('./models/log/log_Train.txt')
+    if os.path.exists('./models/log/log_Train.txt'):
+        os.remove('./models/log/log_Train.txt')
+        os.mknod('./models/log/log_Train.txt')
 
     # Creating generator and discriminator
     generator_xy = Generator()
-    generator_xy = nn.DataParallel(generator_xy)
     generator_xy.load_state_dict(torch.load('./gan2_train_149_xy.pth'))
+    generator_xy = nn.DataParallel(generator_xy)
 
     generator_yx = Generator()
-    generator_yx = nn.DataParallel(generator_yx)
     generator_yx.load_state_dict(torch.load('./gan2_train_149_yx.pth'))
+    generator_yx = nn.DataParallel(generator_yx)
 
     discriminator_x = Discriminator()
+    # discriminator_x.load_state_dict(torch.load('./discriminator2_train_149_xy.pth'))
     discriminator_x = nn.DataParallel(discriminator_x)
-    discriminator_x.load_state_dict(torch.load('./discriminator2_train_149_xy.pth'))
 
     discriminator_y = Discriminator()
+    # discriminator_y.load_state_dict(torch.load('./discriminator2_train_149_yx.pth'))
     discriminator_y = nn.DataParallel(discriminator_y)
-    discriminator_y.load_state_dict(torch.load('./discriminator2_train_149_yx.pth'))
 
     if torch.cuda.is_available():
         generator_xy.cuda(device=device)
@@ -115,6 +118,8 @@ if __name__ == "__main__":
             dx = discriminator_x(x)  # D_X
             dx1 = discriminator_x(x1)  # D_X'
 
+            set_requires_grad([discriminator_x,discriminator_y], True)
+
             ad, ag = computeAdversarialLosses(dx, dx1, dy, dy1)
             # ad.backward(retain_graph=True)
             gradient_penalty = computeGradientPenaltyFor1WayGAN(discriminator_x, x.data, x1.data) + \
@@ -122,6 +127,8 @@ if __name__ == "__main__":
 
             d_loss = computeDiscriminatorLossFor2WayGan(ad, gradient_penalty)
             d_loss.backward(retain_graph=True)
+
+            torch.nn.utils.clip_grad_value_(itertools.chain(discriminator_y.parameters(),discriminator_x.parameters()),clip_value)
 
             optimizer_dx.step()
             optimizer_dy.step()
