@@ -1,10 +1,14 @@
 from pyecharts.charts import *
-from pyecharts import options as opts
 import numpy as np
 from collections import defaultdict
+import os
 
 
 def data_visualization(file_path, save_path):
+
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
+
     i_losses = list()
     c_losses = list()
     g_losses = list()
@@ -54,7 +58,7 @@ def data_visualization(file_path, save_path):
                         g2_losses.append(value)
 
     x_list = list()
-    for i in range(0, 200*113):
+    for i in range(0, 100*12):
         x_list.append(i)
 
     line = Line()
