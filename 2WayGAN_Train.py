@@ -91,6 +91,9 @@ if __name__ == "__main__":
             x = Variable(input.type(Tensor_gpu))  # X
             y = Variable(groundTruth.type(Tensor_gpu))  # Y
 
+            x = x[:, :3, :, :]
+            y = y[:, :3, :, :]
+
             # if batches_done % 50 == 0:
             #     # TRAIN GENERATOR
             #     generator_xy.zero_grad()
