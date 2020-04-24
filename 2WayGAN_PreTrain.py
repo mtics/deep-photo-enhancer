@@ -5,6 +5,7 @@ from libs.compute import *
 from libs.constant import *
 # from libs.old_model import *
 from libs.model import *
+from libs.data import *
 import os
 
 if __name__ == "__main__":
@@ -56,6 +57,10 @@ if __name__ == "__main__":
         for i, (target, input) in enumerate(trainLoader1, 0):
             unenhanced_image = input[0]
             enhanced_image = target[0]
+
+            unenhanced_image = data_augmentation(input, i)
+            enhanced_image = data_augmentation(enhanced_image, i)
+
             x = Variable(unenhanced_image.type(Tensor_gpu))  # X
             y = Variable(enhanced_image.type(Tensor_gpu))  # Y
 

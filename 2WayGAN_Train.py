@@ -85,8 +85,8 @@ if __name__ == "__main__":
             input, dummy = data
             groundTruth, dummy = gt1
 
-            input = data_augmentation(input, i, AUGMENTATION_SIZE)
-            groundTruth = data_augmentation(groundTruth, i, AUGMENTATION_SIZE)
+            input = data_augmentation(input, i)
+            groundTruth = data_augmentation(groundTruth, i)
 
             x = Variable(input.type(Tensor_gpu))  # X
             y = Variable(groundTruth.type(Tensor_gpu))  # Y

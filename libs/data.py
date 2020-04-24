@@ -8,12 +8,11 @@ from libs.constant import *
 from libs.model import *
 
 
-def data_augmentation(img, number, max_da):
+def data_augmentation(img, number):
     """
 
     :param img: Tensor
     :param number:
-    :param max_da:
     :return:
     """
 
