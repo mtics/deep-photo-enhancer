@@ -58,8 +58,8 @@ if __name__ == "__main__":
             unenhanced_image = input[0]
             enhanced_image = target[0]
 
-            unenhanced_image = data_augmentation(input, i)
-            enhanced_image = data_augmentation(enhanced_image, i)
+            unenhanced_image = data_augmentation(input, i)[0]
+            enhanced_image = data_augmentation(target, i)[0]
 
             x = Variable(unenhanced_image.type(Tensor_gpu))  # X
             y = Variable(enhanced_image.type(Tensor_gpu))  # Y

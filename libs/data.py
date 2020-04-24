@@ -16,7 +16,7 @@ def data_augmentation(img, number):
     :return:
     """
 
-    img[0] = img[0].cpu().numpy()
+    img[0] = img[0].numpy()
     index = number // 2
     img[0] = img[0] if number % 2 == 0 else np.fliplr(img[0])
 
