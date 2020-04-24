@@ -18,7 +18,7 @@ def data_loader():
     print("Loading Dataset")
     transform = transforms.Compose([
         transforms.Resize((SIZE, SIZE), interpolation=2),
-        transforms.Pad(padding=[0, 0], padding_mode="symmetric"),
+        transforms.Pad(padding=0, padding_mode="symmetric"),
         transforms.ToTensor(),
     ])
 
