@@ -6,7 +6,7 @@ import torchvision
 import torchvision.transforms as transforms
 from libs.constant import *
 from libs.model import *
-
+import copy
 
 def data_augmentation(img, number):
     """
@@ -20,7 +20,7 @@ def data_augmentation(img, number):
     index = number // 2
     img[0] = img[0] if number % 2 == 0 else np.fliplr(img[0])
 
-    img[0] = np.rot90(img[0], index)
+    img[0] = copy.copy(np.rot90(img[0], index))
 
     img[0] = torch.from_numpy(img[0])
     return img
