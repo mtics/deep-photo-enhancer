@@ -16,14 +16,14 @@ def data_augmentation(img, number):
     :return:
     """
 
-    data = img.numpy()
+    img[0] = img[0].numpy()
     index = number // 2
-    output = data if number % 2 == 0 else np.fliplr(data)
+    img[0] = img[0] if number % 2 == 0 else np.fliplr(img[0])
 
-    output = np.rot90(output, index)
+    img[0] = np.rot90(img[0], index)
 
-    output = torch.from_numpy(output)
-    return output
+    img[0] = torch.from_numpy(img[0])
+    return img
 
 
 def data_visualization(file_path, save_path):
