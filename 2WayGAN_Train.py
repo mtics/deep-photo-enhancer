@@ -31,6 +31,7 @@ if __name__ == "__main__":
 
     discriminator_x = Discriminator()
     discriminator_x = nn.DataParallel(discriminator_x)
+
     discriminator_x.load_state_dict(torch.load('./discriminator2_train_299_xy.pth'))
 
     discriminator_y = Discriminator()
