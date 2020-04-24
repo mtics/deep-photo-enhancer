@@ -64,6 +64,9 @@ if __name__ == "__main__":
             x = Variable(unenhanced_image.type(Tensor_gpu))  # X
             y = Variable(enhanced_image.type(Tensor_gpu))  # Y
 
+            x = x[:, :3, :, :]
+            y = y[:, :3, :, :]
+
             optimizer_g_xy.zero_grad()
             y1 = generator_xy(x)  # X->Y'
             g1_loss = criterion(x, y1)
