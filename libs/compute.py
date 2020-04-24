@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 import torchvision
 import torchvision.transforms as transforms
 from torch import autograd
@@ -15,7 +16,10 @@ def data_loader():
     :return :
     """
     print("Loading Dataset")
-    transform = transforms.Compose([transforms.Resize((SIZE, SIZE), interpolation=2), transforms.ToTensor()])
+    transform = transforms.Compose([
+        transforms.Resize((SIZE, SIZE), interpolation=2),
+        transforms.ToTensor()
+    ])
 
     # testset_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Testing/', transform=transform)
     # trainset_1_gt = torchvision.datasets.ImageFolder(root='./images_LR/Expert-C/Training1/', transform=transform)
@@ -40,6 +44,20 @@ def data_loader():
     testset_inp = torchvision.datasets.ImageFolder(root='./images_LR/s/input/Testing/', transform=transform)
     trainset_1_inp = torchvision.datasets.ImageFolder(root='./images_LR/s/input/Training1/', transform=transform)
     trainset_2_inp = torchvision.datasets.ImageFolder(root='./images_LR/s/input/Training2/', transform=transform)
+
+    testset_gt_imgs = copy.copy(testset_gt.imgs)
+    trainset_1_gt_imgs = copy.copy(trainset_1_gt.imgs)
+    trainset_2_gt_imgs = copy.copy(trainset_2_gt.imgs)
+    testset_inp_imgs = copy.copy(testset_inp.imgs)
+    trainset_1_inp_imgs = copy.copy(trainset_1_inp.imgs)
+    trainset_2_inp_imgs = copy.copy(trainset_2_inp.imgs)
+    for i in range(1, AUGMENTATION_SIZE):
+        testset_gt.imgs.extend(testset_gt_imgs)
+        trainset_1_gt.imgs.extend(trainset_1_gt_imgs)
+        trainset_2_gt.imgs.extend(trainset_2_gt_imgs)
+        testset_inp.imgs.extend(testset_inp_imgs)
+        trainset_1_inp.imgs.extend(trainset_1_inp_imgs)
+        trainset_2_inp.imgs.extend(trainset_2_inp_imgs)
 
     train_loader_1 = torch.utils.data.DataLoader(
         ConcatDataset(
@@ -217,11 +235,11 @@ def compute_gradient_penalty(discriminator, real_sample, fake_sample):
     # gradient_penalty.backward(retain_graph=True)
     return gradient_penalty
 
+
 def _gradient_penalty(self, data, generated_data, gamma=10):
     batch_size = data.size(0)
     epsilon = torch.rand(batch_size, 1, 1, 1)
     epsilon = epsilon.expand_as(data)
-
 
     if self.use_cuda:
         epsilon = epsilon.cuda()
@@ -239,14 +257,15 @@ def _gradient_penalty(self, data, generated_data, gamma=10):
         grad_outputs = grad_outputs.cuda()
 
     gradients = autograd.grad(outputs=interpolation_logits,
-                                inputs=interpolation,
-                                grad_outputs=grad_outputs,
-                                create_graph=True,
-                                retain_graph=True)[0]
+                              inputs=interpolation,
+                              grad_outputs=grad_outputs,
+                              create_graph=True,
+                              retain_graph=True)[0]
 
     gradients = gradients.view(batch_size, -1)
     gradients_norm = torch.sqrt(torch.sum(gradients ** 2, dim=1) + 1e-12)
     return self.gamma * ((gradients_norm - 1) ** 2).mean()
+
 
 def generatorAdversarialLoss(output_images, discriminator):
     """
@@ -339,8 +358,8 @@ def computeAdversarialLosses(dx, dx1, dy, dy1):
 
     return ad, ag
 
-def compute_d_adv_loss(real,fake):
 
+def compute_d_adv_loss(real, fake):
     # dx = discriminatorX(x)
     # dx1 = discriminatorX(x1)
     # dy = discriminator(y)
@@ -352,8 +371,8 @@ def compute_d_adv_loss(real,fake):
 
     return ad
 
-def compute_g_adv_loss(discriminator,discriminatorX, x, x1, y, y1):
 
+def compute_g_adv_loss(discriminator, discriminatorX, x, x1, y, y1):
     dx = discriminatorX(x)
     dx1 = discriminatorX(x1)
     dy = discriminator(y)
@@ -362,6 +381,8 @@ def compute_g_adv_loss(discriminator,discriminatorX, x, x1, y, y1):
     ag = torch.mean(dx1) + torch.mean(dy1)
 
     return ag
+
+
 def computeDiscriminatorLossFor2WayGan(ad, penalty):
     return ad - LAMBDA * penalty
 
@@ -379,6 +400,7 @@ def adjustLearningRate(learning_rate, decay_rate, epoch_num):
     :return:
     """
     return learning_rate / (1 + decay_rate * epoch_num)
+
 
 def set_requires_grad(nets, requires_grad=False):
     """Set requies_grad=Fasle for all the networks to avoid unnecessary computations

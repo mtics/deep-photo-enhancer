@@ -7,6 +7,7 @@ from libs.model import *
 # from libs.old_model import *
 import itertools
 import os
+from libs.data import *
 
 clip_value = 1e8
 
@@ -15,9 +16,9 @@ if __name__ == "__main__":
     start_time = datetime.now()
 
     # delete old logs and create new logs
-    if os.path.exists('./models/log/log_Train.txt'):
-        os.remove('./models/log/log_Train.txt')
-        os.mknod('./models/log/log_Train.txt')
+    # if os.path.exists('./models/log/log_Train.txt'):
+    #     os.remove('./models/log/log_Train.txt')
+    #     os.mknod('./models/log/log_Train.txt')
 
     # Creating generator and discriminator
     generator_xy = Generator()
@@ -83,6 +84,10 @@ if __name__ == "__main__":
         for i, (data, gt1) in enumerate(trainLoader_cross, 0):
             input, dummy = data
             groundTruth, dummy = gt1
+
+            input = data_augmentation(input, i, AUGMENTATION_SIZE)
+            groundTruth = data_augmentation(groundTruth, i, AUGMENTATION_SIZE)
+
             x = Variable(input.type(Tensor_gpu))  # X
             y = Variable(groundTruth.type(Tensor_gpu))  # Y
 

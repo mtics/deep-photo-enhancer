@@ -1,11 +1,33 @@
 from pyecharts.charts import *
-import numpy as np
 from collections import defaultdict
 import os
+import numpy as np
+import torchvision
+import torchvision.transforms as transforms
+from libs.constant import *
+from libs.model import *
+
+
+def data_augmentation(img, number, max_da):
+    """
+
+    :param img: Tensor
+    :param number:
+    :param max_da:
+    :return:
+    """
+
+    data = img.numpy()
+    index = number // 2
+    output = data if number % 2 == 0 else np.fliplr(data)
+
+    output = np.rot90(output, index)
+
+    output = torch.from_numpy(output)
+    return output
 
 
 def data_visualization(file_path, save_path):
-
     if not os.path.exists(save_path):
         os.mkdir(save_path)
 
@@ -58,58 +80,56 @@ def data_visualization(file_path, save_path):
                         g2_losses.append(value)
 
     x_list = list()
-    for i in range(0, 100*12):
+    for i in range(0, 100 * 12):
         x_list.append(i)
 
     line = Line()
     line.add_xaxis(x_list)
     line.add_yaxis("C Loss", c_losses)
-    line.render(save_path+"data_c.html")
+    line.render(save_path + "data_c.html")
 
     line = Line()
     line.add_xaxis(x_list)
     line.add_yaxis("I Loss", i_losses)
-    line.render(save_path+"data_I.html")
+    line.render(save_path + "data_I.html")
 
     line = Line()
     line.add_xaxis(x_list)
     line.add_yaxis("G Loss", g_losses)
-    line.render(save_path+"data_G.html")
+    line.render(save_path + "data_G.html")
 
     line = Line()
     line.add_xaxis(x_list)
     line.add_yaxis("D Loss", d_losses)
-    line.render(save_path+"data_D.html")
+    line.render(save_path + "data_D.html")
 
     line = Line()
     line.add_xaxis(x_list)
     line.add_yaxis("AD", ads)
-    line.render(save_path+"data_AD.html")
+    line.render(save_path + "data_AD.html")
 
     line = Line()
     line.add_xaxis(x_list)
     line.add_yaxis("AG", ags)
-    line.render(save_path+"data_AG.html")
+    line.render(save_path + "data_AG.html")
 
     line = Line()
     line.add_xaxis(x_list)
     line.add_yaxis("GP", gps)
-    line.render(save_path+"data_GP.html")
+    line.render(save_path + "data_GP.html")
 
     line = Line()
     line.add_xaxis(x_list)
     line.add_yaxis("G1", g1_losses)
-    line.render(save_path+"data_G1.html")
+    line.render(save_path + "data_G1.html")
 
     line = Line()
     line.add_xaxis(x_list)
     line.add_yaxis("G2", g2_losses)
-    line.render(save_path+"data_G2.html")
-
+    line.render(save_path + "data_G2.html")
 
 
 def data_visualization_scatter(file_path, save_path):
-
     i_losses = list()
     c_losses = list()
     g_losses = list()
@@ -165,46 +185,46 @@ def data_visualization_scatter(file_path, save_path):
     scatter.add_xaxis(i_dict.keys())
     for key, value_list in i_dict.items():
         scatter.add(key, value_list)
-    scatter.render(save_path+"data_i.html")
+    scatter.render(save_path + "data_i.html")
 
     scatter = Scatter()
     for key, value_list in c_dict.items():
         nparray = np.array(value_list)
         scatter.add_xaxis(key)
         scatter.add_yaxis(key, value_list)
-    scatter.render(save_path+"data_c.html")
+    scatter.render(save_path + "data_c.html")
 
     scatter = Scatter()
     for key, value_list in d_dict.items():
         nparray = np.array(value_list)
         scatter.add_xaxis(key)
         scatter.add_yaxis(key, value_list)
-    scatter.render(save_path+"data_d.html")
+    scatter.render(save_path + "data_d.html")
 
     scatter = Scatter()
     for key, value_list in g_dict.items():
         nparray = np.array(value_list)
         scatter.add_xaxis(key)
         scatter.add_yaxis(key, value_list)
-    scatter.render(save_path+"data_g.html")
+    scatter.render(save_path + "data_g.html")
 
     scatter = Scatter()
     for key, value_list in ad_dict.items():
         nparray = np.array(value_list)
         scatter.add_xaxis(key)
         scatter.add_yaxis(key, value_list)
-    scatter.render(save_path+"data_ad.html")
+    scatter.render(save_path + "data_ad.html")
 
     scatter = Scatter()
     for key, value_list in ag_dict.items():
         nparray = np.array(value_list)
         scatter.add_xaxis(key)
         scatter.add_yaxis(key, value_list)
-    scatter.render(save_path+"data_ag.html")
+    scatter.render(save_path + "data_ag.html")
 
     scatter = Scatter()
     for key, value_list in gp_dict.items():
         nparray = np.array(value_list)
         scatter.add_xaxis(key)
         scatter.add_yaxis(key, value_list)
-    scatter.render(save_path+"data_gp.html")
+    scatter.render(save_path + "data_gp.html")
