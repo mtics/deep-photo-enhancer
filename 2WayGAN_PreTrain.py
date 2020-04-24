@@ -27,8 +27,6 @@ if __name__ == "__main__":
     generator_xy = nn.DataParallel(generator_xy)
     generator_yx = nn.DataParallel(generator_yx)
 
-    cudnn.benchmark = True
-
     if torch.cuda.is_available():
         generator_xy.cuda(device=device)
         generator_yx.cuda(device=device)
