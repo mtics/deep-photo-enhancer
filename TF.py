@@ -7,7 +7,7 @@ from FUNCTION import *
 from PREPROCESSING import *
 
 print(current_time() + ', exp = %s, load_model path = %s' % (
-FLAGS['num_exp'], os.path.dirname(os.path.abspath(__file__))))
+    FLAGS['num_exp'], os.path.dirname(os.path.abspath(__file__))))
 os.environ["CUDA_VISIBLE_DEVICES"] = FLAGS['num_gpu']
 netG_act_o = dict(size=1, index=0)
 
@@ -37,7 +37,8 @@ sess_config.gpu_options.allow_growth = True
 sess = tf.Session(config=sess_config)
 sess.run(tf.global_variables_initializer())
 sess.run(tf.local_variables_initializer())
-saver.restore(sess, FLAGS['load_model_path_new'])
+# saver.restore(sess, FLAGS['load_model_path_new'])
+saver.restore(sess, "model/90.000-new.ckpt")
 
 
 def checkValidImg(input_img):
@@ -111,10 +112,17 @@ def processImg(file_in_name, file_out_name_without_ext):
     # except OSError as e:
     #    print(current_time() + ', remove fail, error = %s' % e.strerror)
     cv2.imwrite(enhance_img_file_path, enhance_test_img)
+    # cv2.imshow(enhanced_img_file_name, enhance_test_img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     return enhanced_img_file_name
 
 
-if __name__=='__main__':
-    file_name = getInputPhoto("images_LR/s/input/Testing/1/a0009-kme_372.tif")
+if __name__ == '__main__':
 
-    enhanced_img_file_name = processImg(file_name, "a0009_enhanced")
+    path = "E:\\Workspace\\毕设相关\\static\\uploads\\images_LR\\s\\input\\Testing\\1\\"
+    files = os.listdir(path)
+    for file in files:
+        file_name = file.split(".")[0]
+        file = getInputPhoto("images_LR\\s\\input\\Testing\\1\\"+file)
+        enhanced_img_file_name = processImg(file, file_name + "_enhanced")

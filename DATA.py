@@ -19,6 +19,8 @@ FLAGS['root_path'] = os.path.dirname(__file__)
 FLAGS['load_model_path'] = FLAGS['root_path'] + '/model/' + '%s.ckpt' % (FLAGS['format_log_step'] % FLAGS['num_epoch'])
 FLAGS['load_model_path_new'] = FLAGS['root_path'] + '/model/' + '%s-new.ckpt' % (
             FLAGS['format_log_step'] % FLAGS['num_epoch'])
+# FLAGS['load_model_path_new'] = 'model/' + '%s-new.ckpt' % (
+#             FLAGS['format_log_step'] % FLAGS['num_epoch'])
 FLAGS['data_output_ext'] = '.png'
 FLAGS['data_input_dtype'] = np.uint8
 FLAGS['data_compute_dtype'] = np.float32

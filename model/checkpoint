@@ -1,2 +1,2 @@
-model_checkpoint_path: "90.000-new.ckpt"
-all_model_checkpoint_paths: "90.000-new.ckpt"
+model_checkpoint_path: "./model/90.000-new.ckpt"
+all_model_checkpoint_paths: "./model/90.000-new.ckpt"
