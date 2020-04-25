@@ -1,7 +1,7 @@
 import tensorflow as tf
 
-from DATA import *
-from CONVNET import *
+from .DATA import *
+from .CONVNET import *
 
 def conv_net_block(conv_net, net_info, tensor_list, is_first, is_training, act_o):
     seed = FLAGS['process_random_seed']
@@ -92,6 +92,10 @@ def model(net_info, tensor, is_training, act_o, is_first=False):
             _ = conv_net_block(net_n, net_info, tensor_list, is_first, is_training, act_o)
         result = tensor_list[-1]
     elif net_info.name == "netG":
+        for net_n in net_info.CONV_NETS:
+            _ = conv_net_block(net_n, net_info, tensor_list, is_first, is_training, act_o)
+        result = tensor_list[-1]
+    elif (net_info.name).startswith('netG'):
         for net_n in net_info.CONV_NETS:
             _ = conv_net_block(net_n, net_info, tensor_list, is_first, is_training, act_o)
         result = tensor_list[-1]

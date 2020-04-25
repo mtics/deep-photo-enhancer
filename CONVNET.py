@@ -176,13 +176,6 @@ def exe_in_layer(tensor, layer_o, net_info, l_index, is_first, trainable, act_o)
         t = tf.nn.batch_normalization(t, batch_mean, batch_var, offset, scale, layer_o['epsilon'])
         result.append(t)
     return tf.pack(result)
-
-    # mean, variance = tf.nn.moments(tensor, axes=[1,2], keep_dims=True)
-    # epsilon = layer_o['epsilon']
-    # inv = tf.rsqrt(variance + epsilon)
-    # normalized = (tensor - mean)*inv
-    # return scale*normalized + offset
-    
     # mean, var = tf.nn.moments(tensor, [1, 2], keep_dims=True)
     # normalized = tf.div(tf.sub(tensor, mean), tf.sqrt(tf.add(var, layer_o['epsilon'])))
     # return scale * normalized + offset
@@ -321,7 +314,7 @@ def exe_conv_res_layer(res_tensor, layer_o, tensor_list, net_info, l_index, is_f
 #  .##..##..##..........##....##....##..##..##..##..##..##..##.....
 #  .##..##..######...####...######..#####....####...##..##..######.
 #  ................................................................
-def res_layer(index, axis=None):
+def res_layer(index, axis):
     return dict(
         name='res',
         index=index,
@@ -331,9 +324,8 @@ def exe_res_layer(tensor, layer_o, tensor_list):
     index = layer_o['index']
     axis = layer_o['axis']
     res_tensor = tensor_list[index]
-    if axis is not None:
-        l = [res_tensor[:, :, :, i] for i in axis]
-        res_tensor = tf.pack(l, -1)
+    l = [res_tensor[:, :, :, i] for i in axis]
+    res_tensor = tf.pack(l, -1)
     tensor = tf.add(tensor, res_tensor)
     return tensor
 
