@@ -111,6 +111,7 @@ def processImg(file_in_name, file_out_name_without_ext):
     #    os.remove(enhance_img_file_path)
     # except OSError as e:
     #    print(current_time() + ', remove fail, error = %s' % e.strerror)
+    enhance_test_img = cv2.resize(enhance_test_img, (352, 288), interpolation=cv2.INTER_AREA)
     cv2.imwrite(enhance_img_file_path, enhance_test_img)
     # cv2.imshow(enhanced_img_file_name, enhance_test_img)
     # cv2.waitKey(0)
