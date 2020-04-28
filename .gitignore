@@ -2,6 +2,7 @@
 ! models/log/*.txt
  
 /images_LR/*
+/images/*
 /.idea/*
 /models/*
 /libs/__pycache__/*
